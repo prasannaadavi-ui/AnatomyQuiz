@@ -3,25 +3,22 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Quiz Engine</title>
+    <title>Anatomy Quiz Engine</title>
     <style>
         :root { --primary: #2563eb; --bg: #f8fafc; --card: #ffffff; }
-        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background: var(--bg); color: #1e293b; line-height: 1.6; padding: 20px; }
-        .container { max-width: 800px; margin: 0 auto; background: var(--card); padding: 30px; border-radius: 12px; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.1); }
-        h1 { color: var(--primary); text-align: center; margin-bottom: 30px; }
+        body { font-family: 'Segoe UI', system-ui, sans-serif; background: var(--bg); color: #1e293b; padding: 20px; }
+        .container { max-width: 800px; margin: 0 auto; background: var(--card); padding: 30px; border-radius: 12px; box-shadow: 0 4px 10px rgba(0,0,0,0.1); }
+        h1 { color: var(--primary); text-align: center; }
         .setup-group { margin-bottom: 20px; }
         select, input, button { width: 100%; padding: 12px; margin-top: 8px; border: 1px solid #cbd5e1; border-radius: 6px; font-size: 16px; box-sizing: border-box; }
-        button { background: var(--primary); color: white; border: none; cursor: pointer; font-weight: 600; transition: opacity 0.2s; margin-top: 10px; }
-        button:hover { opacity: 0.9; }
+        button { background: var(--primary); color: white; border: none; cursor: pointer; font-weight: bold; }
         .hidden { display: none; }
-        .option { display: block; padding: 15px; border: 2px solid #e2e8f0; margin-bottom: 10px; border-radius: 8px; cursor: pointer; transition: all 0.2s; }
-        .option:hover { border-color: var(--primary); background: #eff6ff; }
+        .option { display: block; padding: 15px; border: 2px solid #e2e8f0; margin-bottom: 10px; border-radius: 8px; cursor: pointer; }
         .option.selected { border-color: var(--primary); background: #dbeafe; }
-        .explanation { background: #f1f5f9; padding: 20px; border-radius: 8px; margin-top: 20px; border-left: 5px solid var(--primary); margin-bottom: 20px;}
+        .explanation { background: #f1f5f9; padding: 20px; border-radius: 8px; margin-bottom: 20px; border-left: 5px solid var(--primary); }
         .correct { color: #16a34a; font-weight: bold; }
         .incorrect { color: #dc2626; font-weight: bold; }
-        #progress { margin-bottom: 20px; font-weight: bold; color: var(--primary); font-size: 1.1em; }
-        #q-text { font-size: 1.2em; margin-bottom: 20px; }
+        #progress { margin-bottom: 10px; font-weight: bold; color: var(--primary); }
     </style>
 </head>
 <body>
@@ -30,77 +27,129 @@
     <h1>Quiz Engine</h1>
     
     <div id="setup-screen">
-        <p id="loading-msg">Fetching question bank from Gist...</p>
-        <div id="controls" class="hidden">
-            <div class="setup-group">
-                <label><strong>Select Topic:</strong></label>
-                <select id="topic-select"></select>
-            </div>
-            <div class="setup-group">
-                <label><strong>Number of Questions:</strong></label>
-                <input type="number" id="q-count" value="10" min="1">
-            </div>
-            <button onclick="startQuiz()">Start Quiz</button>
+        <div class="setup-group">
+            <label><strong>Select Topic:</strong></label>
+            <select id="topic-select"></select>
         </div>
+        <div class="setup-group">
+            <label><strong>How many questions?</strong></label>
+            <input type="number" id="q-count" value="5" min="1">
+        </div>
+        <button onclick="startQuiz()">Start Quiz</button>
     </div>
 
     <div id="quiz-screen" class="hidden">
         <div id="progress"></div>
         <div id="question-container">
-            <div id="q-text"></div>
+            <p id="q-topic" style="font-size: 0.8em; color: gray; text-transform: uppercase;"></p>
+            <h3 id="q-text"></h3>
             <div id="options-container"></div>
         </div>
         <button id="next-btn" class="hidden" onclick="nextQuestion()">Next Question</button>
     </div>
 
     <div id="results-screen" class="hidden">
-        <h2>Quiz Complete!</h2>
-        <p id="final-score" style="font-size: 1.5em; font-weight: bold;"></p>
-        <hr>
+        <h2>Results</h2>
+        <p id="final-score" style="font-size: 1.5em;"></p>
         <div id="review-area"></div>
-        <button onclick="location.reload()">Take Another Quiz</button>
+        <button onclick="location.reload()">New Quiz</button>
     </div>
 </div>
 
 <script>
+    // YOUR DATA EMBEDDED DIRECTLY
+    const rawData = `
+## Agile
+1. A project manager is managing a project which is in the middle of execution. The project is being managed using a hybrid approach. The project manager has just received a change request from the customer. What should the project manager do first?
+A. Impact assessment of the change request.
+B. Update the change request log.
+C. Present the change request to the CCB.
+D. Ask the customer to follow the formal change management process.
+Answer: B
+Explanation: The question asks what should be done "first". Before any assessment or action, the change request must be logged.
+
+## Risk Management
+1. You are the project manager for a large construction project. You have just identified a risk that could potentially delay the project by two months. What should you do first?
+A. Update the risk register.
+B. Develop a risk response plan.
+C. Inform the project sponsor.
+D. Perform a qualitative risk analysis.
+Answer: A
+Explanation: According to the PMBOK, when a new risk is identified, the very first step is to record it in the Risk Register.
+    `;
+
     let allQuestions = [];
     let activeQuestions = [];
     let currentIdx = 0;
     let userAnswers = [];
 
-    const GIST_URL = 'https://gist.githubusercontent.com/prasannaadavi-ui/521817e7f478431c750c27bcdd93df80/raw/e74e32b42a47cd209da7a2dc4520929cdd0e3d9b/gistfile1.txt';
-
-    async function init() {
-        try {
-            const response = await fetch(GIST_URL);
-            const text = await response.text();
-            parseMD(text);
-            
-            if(allQuestions.length === 0) throw new Error("No questions found");
-
-            const topics = [...new Set(allQuestions.map(q => q.topic))];
-            const select = document.getElementById('topic-select');
-            select.innerHTML = '<option value="all">All Topics (Mixed)</option>' + 
-                topics.map(t => `<option value="${t}">${t}</option>`).join('');
-            
-            document.getElementById('loading-msg').classList.add('hidden');
-            document.getElementById('controls').classList.remove('hidden');
-        } catch (e) {
-            document.getElementById('loading-msg').innerText = "Error: Could not load questions. Check Gist format.";
-            console.error(e);
-        }
-    }
-
-    function parseMD(text) {
-        // Split by topic headers (e.g., ## Topic Name)
-        const sections = text.split(/##\s+/).filter(s => s.trim() !== "");
-        
+    function parseData() {
+        const sections = rawData.split(/##\s+/).filter(s => s.trim());
         sections.forEach(section => {
             const lines = section.split('\n');
             const topic = lines[0].trim();
-            
-            // Split by question markers (e.g., 1. Question Text)
             const qBlocks = section.split(/\n\d+\.\s+/).slice(1);
             
             qBlocks.forEach(block => {
-                // Find
+                const parts = block.split(/\n\s*[A-D]\.\s/);
+                const questionText = parts[0].trim();
+                const options = parts.slice(1, 5).map(o => o.split(/\n(Answer|Explanation):/i)[0].trim());
+                const answer = block.match(/Answer:\s*([A-D])/i)?.[1];
+                const explanation = block.match(/Explanation:\s*([\s\S]*)$/i)?.[1] || "No explanation provided.";
+
+                if (answer) {
+                    allQuestions.push({ topic, question: questionText, options, answer, explanation });
+                }
+            });
+        });
+
+        const topics = [...new Set(allQuestions.map(q => q.topic))];
+        document.getElementById('topic-select').innerHTML = '<option value="all">All Topics</option>' + 
+            topics.map(t => `<option value="${t}">${t}</option>`).join('');
+    }
+
+    function startQuiz() {
+        const topic = document.getElementById('topic-select').value;
+        const count = parseInt(document.getElementById('q-count').value);
+        let filtered = topic === 'all' ? allQuestions : allQuestions.filter(q => q.topic === topic);
+        activeQuestions = filtered.sort(() => 0.5 - Math.random()).slice(0, count);
+        
+        document.getElementById('setup-screen').classList.add('hidden');
+        document.getElementById('quiz-screen').classList.remove('hidden');
+        showQuestion();
+    }
+
+    function showQuestion() {
+        const q = activeQuestions[currentIdx];
+        document.getElementById('progress').innerText = `Question ${currentIdx + 1} of ${activeQuestions.length}`;
+        document.getElementById('q-topic').innerText = q.topic;
+        document.getElementById('q-text').innerText = q.question;
+        const container = document.getElementById('options-container');
+        container.innerHTML = '';
+        document.getElementById('next-btn').classList.add('hidden');
+
+        ['A','B','C','D'].forEach((letter, i) => {
+            const div = document.createElement('div');
+            div.className = 'option';
+            div.innerText = `${letter}. ${q.options[i]}`;
+            div.onclick = () => {
+                document.querySelectorAll('.option').forEach(o => o.classList.remove('selected'));
+                div.classList.add('selected');
+                userAnswers[currentIdx] = letter;
+                document.getElementById('next-btn').classList.remove('hidden');
+            };
+            container.appendChild(div);
+        });
+    }
+
+    function nextQuestion() {
+        if (currentIdx < activeQuestions.length - 1) {
+            currentIdx++;
+            showQuestion();
+        } else {
+            showResults();
+        }
+    }
+
+    function showResults() {
+        document.getElementById('quiz-screen').classList.add('
