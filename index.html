@@ -3,56 +3,55 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Quiz Engine</title>
+    <title>Neuroscience Quiz Engine</title>
     <style>
-        :root { --primary: #2563eb; --bg: #f8fafc; --card: #ffffff; }
-        body { font-family: system-ui, -apple-system, sans-serif; background: var(--bg); padding: 20px; color: #1e293b; }
-        .container { max-width: 800px; margin: 0 auto; background: var(--card); padding: 30px; border-radius: 12px; box-shadow: 0 4px 10px rgba(0,0,0,0.05); }
-        h1 { text-align: center; color: var(--primary); }
-        .setup-group { margin-bottom: 20px; }
-        label { display: block; font-weight: bold; margin-bottom: 5px; }
-        select, input, button { width: 100%; padding: 12px; border-radius: 8px; border: 1px solid #cbd5e1; font-size: 16px; box-sizing: border-box; }
-        button { background: var(--primary); color: white; border: none; cursor: pointer; font-weight: bold; margin-top: 10px; }
+        :root { --bg: #0f172a; --card: #1e293b; --primary: #38bdf8; --text: #f1f5f9; --muted: #94a3b8; }
+        body { font-family: 'Inter', sans-serif; background: var(--bg); color: var(--text); display: flex; align-items: center; justify-content: center; min-height: 100vh; margin: 0; }
+        .container { width: 90%; max-width: 900px; background: var(--card); padding: 40px; border-radius: 24px; box-shadow: 0 25px 50px -12px rgba(0,0,0,0.5); border: 1px solid #334155; }
+        h1 { font-size: 1.5rem; font-weight: 800; margin-bottom: 2rem; display: flex; align-items: center; gap: 10px; }
+        .search-container { position: relative; background: #0f172a; border-radius: 16px; padding: 20px; border: 1px solid #334155; }
+        input { width: 100%; background: transparent; border: none; color: white; font-size: 1.2rem; outline: none; padding: 10px 0; }
+        .prompt-label { color: var(--muted); font-size: 0.9rem; margin-bottom: 10px; display: block; }
+        .quick-topics { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 30px; }
+        .chip { background: #334155; padding: 8px 16px; border-radius: 20px; font-size: 0.85rem; cursor: pointer; transition: 0.2s; border: 1px solid transparent; }
+        .chip:hover { background: #475569; border-color: var(--primary); }
         .hidden { display: none; }
-        .option { display: block; padding: 15px; border: 2px solid #e2e8f0; margin-bottom: 10px; border-radius: 8px; cursor: pointer; }
-        .option.selected { border-color: var(--primary); background: #eff6ff; }
-        .explanation { background: #f1f5f9; padding: 15px; border-radius: 8px; border-left: 5px solid var(--primary); margin-bottom: 20px; }
-        #debug-log { background: #fee2e2; color: #991b1b; padding: 15px; border-radius: 8px; font-family: monospace; font-size: 12px; margin-top: 20px; }
+        .option { background: #334155; padding: 15px; border-radius: 12px; margin-bottom: 10px; cursor: pointer; border: 2px solid transparent; }
+        .option.selected { border-color: var(--primary); background: #1e293b; }
+        button { background: var(--primary); color: #0f172a; border: none; padding: 12px 24px; border-radius: 10px; font-weight: bold; cursor: pointer; width: 100%; margin-top: 20px; }
+        .explanation-card { background: #0f172a; padding: 20px; border-radius: 12px; margin-top: 15px; border-left: 4px solid var(--primary); }
     </style>
 </head>
 <body>
 
 <div class="container">
-    <h1>Quiz Engine</h1>
-    
     <div id="setup-screen">
-        <p id="loading-status">Checking for state-test-bank.md...</p>
-        <div id="controls" class="hidden">
-            <div class="setup-group">
-                <label>Select Topic:</label>
-                <select id="topic-select"></select>
-            </div>
-            <div class="setup-group">
-                <label>How many questions?</label>
-                <input type="number" id="q-count" value="5">
-            </div>
-            <button onclick="startQuiz()">Start Quiz</button>
+        <h1><span>🧠</span> Neuroscience Quiz Engine</h1>
+        
+        <div class="search-container">
+            <span class="prompt-label">What do you want to study?</span>
+            <input type="text" id="ai-input" placeholder='e.g. "10 questions on visual pathways" or "quiz me on everything"'>
+            <button onclick="processAIInput()">Generate Quiz</button>
         </div>
-        <div id="debug-log" class="hidden"></div>
+
+        <div style="margin-top: 30px;">
+            <span class="prompt-label">QUICK TOPICS</span>
+            <div class="quick-topics" id="topic-chips">
+                </div>
+        </div>
     </div>
 
     <div id="quiz-screen" class="hidden">
-        <div id="progress" style="font-weight: bold; color: var(--primary); margin-bottom: 10px;"></div>
-        <h3 id="q-text"></h3>
+        <div id="progress" style="color: var(--primary); margin-bottom: 15px; font-weight: bold;"></div>
+        <h2 id="q-text"></h2>
         <div id="options-container"></div>
-        <button id="next-btn" class="hidden" onclick="nextQuestion()">Next Question</button>
+        <button id="next-btn" class="hidden" onclick="nextQuestion()">Confirm & Next</button>
     </div>
 
     <div id="results-screen" class="hidden">
-        <h2>Results</h2>
-        <div id="final-score" style="font-size: 24px; font-weight: bold; margin-bottom: 20px;"></div>
+        <h2>Quiz Results</h2>
         <div id="review-area"></div>
-        <button onclick="location.reload()">Restart</button>
+        <button onclick="location.reload()">Start New Session</button>
     </div>
 </div>
 
@@ -62,77 +61,63 @@
     let currentIdx = 0;
     let userAnswers = [];
 
-    // 1. Fetch the file
     async function init() {
-        const log = document.getElementById('debug-log');
-        try {
-            const response = await fetch('state-test-bank.md');
-            if (!response.ok) throw new Error("Could not find state-test-bank.md in this folder.");
-            const text = await response.text();
-            
-            parseMarkdown(text);
-
-            if (allQuestions.length === 0) {
-                log.classList.remove('hidden');
-                log.innerText = "Found file, but 0 questions parsed. Ensure questions are formatted as: \n1. Question \nA. Opt \nAnswer: A";
-                return;
-            }
-
-            // Populate UI
-            const topics = [...new Set(allQuestions.map(q => q.topic))];
-            const select = document.getElementById('topic-select');
-            select.innerHTML = '<option value="all">All Topics</option>' + 
-                topics.map(t => `<option value="${t}">${t}</option>`).join('');
-            
-            document.getElementById('loading-status').classList.add('hidden');
-            document.getElementById('controls').classList.remove('hidden');
-
-        } catch (err) {
-            log.classList.remove('hidden');
-            log.innerText = "Error: " + err.message;
-        }
+        const response = await fetch('state-test-bank.md');
+        const text = await response.text();
+        parseMD(text);
+        renderChips();
     }
 
-    // 2. Robust Parser
-    function parseMarkdown(text) {
-        // Split by Topic Headers (##)
+    function parseMD(text) {
         const sections = text.split(/##\s+/).filter(s => s.trim());
-        
         sections.forEach(section => {
             const lines = section.split('\n');
             const topic = lines[0].trim();
-            
-            // Regex to find: Numbered question, 4 Options, and Answer
-            const questionRegex = /(\d+\.[\s\S]+?)(?=Answer:)/gi;
-            const matches = section.matchAll(questionRegex);
-
-            for (const match of matches) {
-                const block = match[0];
-                const fullBlock = section.substring(match.index); // Include the Answer part
-                
-                // Extract parts
-                const qText = block.split(/\n\s*[A-D]\.\s/)[0].replace(/^\d+\.\s*/, "").trim();
-                const options = block.split(/\n\s*[A-D]\.\s/).slice(1, 5).map(o => o.trim());
-                const ansMatch = fullBlock.match(/Answer:\s*([A-D])/i);
-                const explMatch = fullBlock.match(/Explanation:\s*([\s\S]+?)(?=\n\d+\.|$)/i);
-
-                if (ansMatch && options.length >= 4) {
-                    allQuestions.push({
-                        topic,
-                        question: qText,
-                        options,
-                        answer: ansMatch[1].toUpperCase(),
-                        explanation: explMatch ? explMatch[1].trim() : "Correct answer confirmed."
-                    });
-                }
-            }
+            const qBlocks = section.split(/\n\d+\.\s+/).slice(1);
+            qBlocks.forEach(block => {
+                const parts = block.split(/\n\s*[A-D]\.\s/);
+                if (parts.length < 5) return;
+                const answer = block.match(/Answer:\s*([A-D])/i)?.[1];
+                const explanation = block.match(/Explanation:\s*([\s\S]*)$/i)?.[1] || "No explanation.";
+                allQuestions.push({
+                    topic: topic.toLowerCase(),
+                    displayTopic: topic,
+                    question: parts[0].trim(),
+                    options: parts.slice(1, 5).map(o => o.split(/\n(Answer|Explanation):/i)[0].trim()),
+                    answer,
+                    explanation
+                });
+            });
         });
     }
 
-    function startQuiz() {
-        const topic = document.getElementById('topic-select').value;
-        const count = parseInt(document.getElementById('q-count').value);
-        let filtered = topic === 'all' ? allQuestions : allQuestions.filter(q => q.topic === topic);
+    function renderChips() {
+        const topics = [...new Set(allQuestions.map(q => q.displayTopic))];
+        const container = document.getElementById('topic-chips');
+        topics.forEach(t => {
+            const chip = document.createElement('div');
+            chip.className = 'chip';
+            chip.innerText = t;
+            chip.onclick = () => { document.getElementById('ai-input').value = `10 questions on ${t}`; };
+            container.appendChild(chip);
+        });
+    }
+
+    function processAIInput() {
+        const input = document.getElementById('ai-input').value.toLowerCase();
+        
+        // 1. Extract Number
+        const numMatch = input.match(/\d+/);
+        const count = numMatch ? parseInt(numMatch[0]) : 5;
+
+        // 2. Filter by Keyword
+        let filtered = allQuestions.filter(q => {
+            if (input.includes('everything') || input.includes('mixed')) return true;
+            return input.includes(q.topic) || q.question.toLowerCase().includes(input.split(' ').pop());
+        });
+
+        if (filtered.length === 0) filtered = allQuestions; // Fallback
+
         activeQuestions = filtered.sort(() => 0.5 - Math.random()).slice(0, count);
         
         document.getElementById('setup-screen').classList.add('hidden');
@@ -142,7 +127,7 @@
 
     function showQuestion() {
         const q = activeQuestions[currentIdx];
-        document.getElementById('progress').innerText = `Question ${currentIdx + 1} of ${activeQuestions.length}`;
+        document.getElementById('progress').innerText = `QUESTION ${currentIdx + 1} OF ${activeQuestions.length}`;
         document.getElementById('q-text').innerText = q.question;
         const container = document.getElementById('options-container');
         container.innerHTML = '';
@@ -174,24 +159,20 @@
     function showResults() {
         document.getElementById('quiz-screen').classList.add('hidden');
         document.getElementById('results-screen').classList.remove('hidden');
-        let score = 0;
         let html = '';
         activeQuestions.forEach((q, i) => {
-            const correct = userAnswers[i] === q.answer;
-            if (correct) score++;
-            html += `<div class="explanation">
-                <strong>Q${i+1}: ${q.question}</strong><br>
-                Your Answer: <span style="color:${correct?'green':'red'}">${userAnswers[i]}</span> | 
-                Correct: <span style="color:green">${q.answer}</span><br>
+            const isCorrect = userAnswers[i] === q.answer;
+            html += `<div class="explanation-card">
+                <p><strong>Q${i+1}: ${q.question}</strong></p>
+                <p>Result: <span style="color:${isCorrect?'#4ade80':'#fb7185'}">${isCorrect?'Correct':'Incorrect'}</span></p>
+                <p>Correct: ${q.answer}</p>
                 <p><em>${q.explanation}</em></p>
             </div>`;
         });
-        document.getElementById('final-score').innerText = `Total Score: ${score} / ${activeQuestions.length}`;
         document.getElementById('review-area').innerHTML = html;
     }
 
     init();
 </script>
-
 </body>
 </html>
