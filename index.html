@@ -3,107 +3,205 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Neuroscience Quiz Engine</title>
+    <title>Anatomy & Physiology Quiz Engine</title>
     <style>
-        :root { --bg: #0f172a; --card: #1e293b; --primary: #38bdf8; --text: #f1f5f9; --muted: #94a3b8; }
-        body { font-family: 'Segoe UI', system-ui, sans-serif; background: var(--bg); color: var(--text); padding: 20px; }
-        .container { max-width: 800px; margin: 40px auto; background: var(--card); padding: 40px; border-radius: 24px; border: 1px solid #334155; }
-        .search-container { background: #0f172a; border-radius: 16px; padding: 25px; border: 1px solid #334155; margin: 20px 0; }
-        input { width: 100%; background: transparent; border: none; color: white; font-size: 1.1rem; outline: none; margin: 10px 0; border-bottom: 2px solid #334155; padding-bottom: 5px; }
+        :root { --bg: #0f172a; --card: #1e293b; --primary: #38bdf8; --text: #f1f5f9; --accent: #7dd3fc; }
+        body { font-family: 'Inter', system-ui, sans-serif; background: var(--bg); color: var(--text); margin: 0; padding: 20px; }
+        .container { max-width: 850px; margin: 40px auto; background: var(--card); padding: 40px; border-radius: 24px; border: 1px solid #334155; box-shadow: 0 25px 50px -12px rgba(0,0,0,0.5); }
+        .search-box { background: #0f172a; border-radius: 16px; padding: 25px; border: 1px solid #334155; margin: 20px 0; }
+        input { width: 100%; background: transparent; border: none; color: white; font-size: 1.2rem; outline: none; border-bottom: 2px solid #334155; padding: 10px 0; }
         input:focus { border-color: var(--primary); }
-        .chip { display: inline-block; background: #334155; padding: 6px 14px; border-radius: 20px; font-size: 0.8rem; cursor: pointer; margin: 4px; transition: 0.2s; border: 1px solid transparent; }
-        .chip:hover { border-color: var(--primary); background: #1e293b; }
+        .chip { display: inline-block; background: #334155; padding: 8px 16px; border-radius: 20px; font-size: 0.85rem; cursor: pointer; margin: 5px; transition: 0.2s; border: 1px solid transparent; }
+        .chip:hover { border-color: var(--primary); background: #0f172a; }
         .hidden { display: none; }
         .option { background: #334155; padding: 18px; border-radius: 12px; margin-bottom: 12px; cursor: pointer; border: 2px solid transparent; transition: 0.2s; }
         .option:hover { background: #475569; }
         .option.selected { border-color: var(--primary); background: #0f172a; }
-        button { background: var(--primary); color: #0f172a; border: none; padding: 14px; border-radius: 10px; font-weight: bold; cursor: pointer; width: 100%; font-size: 1rem; }
-        .explanation-card { background: #0f172a; padding: 20px; border-radius: 12px; margin-top: 15px; border-left: 5px solid var(--primary); }
-        #progress-bar { height: 6px; background: #334155; border-radius: 3px; margin-bottom: 20px; }
-        #progress-fill { height: 100%; background: var(--primary); width: 0%; border-radius: 3px; transition: width 0.3s; }
+        button { background: var(--primary); color: #0f172a; border: none; padding: 16px; border-radius: 12px; font-weight: 800; cursor: pointer; width: 100%; font-size: 1rem; text-transform: uppercase; letter-spacing: 1px; }
+        .explanation { background: #0f172a; padding: 25px; border-radius: 12px; margin-top: 20px; border-left: 5px solid var(--primary); line-height: 1.6; }
+        #progress-bar { height: 8px; background: #334155; border-radius: 4px; margin-bottom: 25px; overflow: hidden; }
+        #progress-fill { height: 100%; background: var(--primary); width: 0%; transition: width 0.4s ease; }
+        .case-study-box { background: #0f172a; padding: 20px; border-radius: 12px; border: 1px solid #334155; margin-bottom: 20px; }
     </style>
 </head>
 <body>
 
 <div class="container">
     <div id="setup-screen">
-        <h1 style="margin:0;">Neuroscience Quiz Engine</h1>
-        <p style="color:var(--muted); margin-bottom:30px;">Science Olympiad 2026 Division B</p>
+        <h1 style="margin:0;">Neuroscience Engine 2026</h1>
+        <p style="color:var(--accent); font-weight:600; font-size:0.9rem;">State & National Study Portal</p>
         
-        <div class="search-container">
-            <label style="font-size: 0.8rem; color: var(--primary); font-weight: bold; letter-spacing: 1px;">INTENT ROUTER</label>
-            <input type="text" id="ai-input" placeholder='e.g. "10 questions on endocrine" or "quiz me on vision"'>
-            <button onclick="processRequest()">Generate Quiz</button>
+        <div class="search-box">
+            <span style="font-size: 0.75rem; color: var(--primary); font-weight: 800; text-transform: uppercase;">Build Custom Quiz</span>
+            <input type="text" id="user-query" placeholder='e.g. "10 questions on ALS" or "quiz me on vision"'>
+            <button onclick="startQuiz()" style="margin-top:20px;">Launch Session</button>
         </div>
 
-        <div id="quick-topics">
-            <p style="font-size: 0.75rem; color: var(--muted); font-weight: bold; margin-bottom:10px;">POPULAR TOPICS</p>
-            <div id="topic-chips"></div>
+        <div id="quick-links">
+            <p style="font-size: 0.75rem; color: var(--muted); font-weight: 800; margin-bottom:10px;">QUICK START</p>
+            <div id="chips-container"></div>
         </div>
     </div>
 
     <div id="quiz-screen" class="hidden">
         <div id="progress-bar"><div id="progress-fill"></div></div>
-        <div id="progress-text" style="font-size: 0.8rem; color: var(--muted); margin-bottom: 15px;"></div>
-        <h2 id="q-text" style="font-size: 1.3rem; margin-bottom: 25px;"></h2>
+        <div id="q-header" style="font-size: 0.8rem; color: var(--accent); margin-bottom: 10px; font-weight:bold;"></div>
+        <div id="q-content"></div>
         <div id="options-container"></div>
-        <button id="next-btn" class="hidden" onclick="handleNext()">Confirm Answer</button>
+        <button id="next-btn" class="hidden" onclick="handleNext()" style="margin-top:20px;">Confirm Answer</button>
     </div>
 
     <div id="results-screen" class="hidden">
-        <h2 style="text-align:center;">Quiz Review</h2>
-        <div id="final-score" style="text-align:center; font-size: 2rem; margin-bottom: 30px;"></div>
-        <div id="review-area"></div>
-        <button onclick="location.reload()">New Quiz</button>
+        <h2 style="text-align:center;">Session Review</h2>
+        <div id="score-display" style="text-align:center; font-size: 3rem; font-weight: 800; color: var(--primary); margin-bottom: 30px;"></div>
+        <div id="review-list"></div>
+        <button onclick="location.reload()">Start New Session</button>
     </div>
 </div>
 
 <script>
-    let allQuestions = [];
-    let activeQuestions = [];
+    let questionBank = [];
+    let currentQuiz = [];
     let currentIdx = 0;
-    let userAnswers = [];
+    let score = 0;
+    let userSelections = [];
 
-    async function init() {
+    // Load and Parse the MD File
+    async function loadData() {
         try {
-            const response = await fetch('state-test-bank.md');
+            const response = await fetch('anatomy_study_guide.md');
             const text = await response.text();
-            parseMD(text);
+            parseMarkdown(text);
             generateChips();
         } catch (e) {
-            console.error("Failed to load question bank.");
+            alert("Error: anatomy_study_guide.md not found in repository.");
         }
     }
 
-    function parseMD(text) {
-        const sections = text.split(/##\s+/).filter(s => s.trim());
-        sections.forEach(section => {
-            const lines = section.split('\n');
-            const topic = lines[0].trim();
-            const qBlocks = section.split(/\n\d+\.\s+/).slice(1);
-            qBlocks.forEach(block => {
-                const parts = block.split(/\n\s*[A-D]\.\s/);
-                if (parts.length < 5) return;
-                const answerMatch = block.match(/Answer:\s*([A-D])/i);
-                const explMatch = block.match(/Explanation:\s*([\s\S]*)$/i);
-                if (answerMatch) {
-                    allQuestions.push({
-                        topic: topic,
-                        question: parts[0].trim(),
-                        options: parts.slice(1, 5).map(o => o.split(/\n(Answer|Explanation):/i)[0].trim()),
-                        answer: answerMatch[1].toUpperCase(),
-                        explanation: explMatch ? explMatch[1].trim() : "Standard competition logic applies."
-                    });
-                }
+    function parseMarkdown(text) {
+        // Parse MC Questions
+        const mcParts = text.split(/---/).filter(p => p.includes('**Q'));
+        mcParts.forEach(part => {
+            const qText = part.match(/\*\*Q\d+\.\*\*([\s\S]+?)(?=- [A-D]|\*\*Answer)/i)?.[1].trim();
+            const options = Array.from(part.matchAll(/- ([A-D])\. ([\s\S]+?)(?=\n- [A-D]|\n\*\*Answer|$)/g)).map(m => m[2].trim());
+            const answer = part.match(/\*\*Answer:\s*([A-D])/i)?.[1];
+            const explanation = part.split(/\*\*Answer:.*?\*\*/i)[1]?.trim() || "See study guide for details.";
+            if (qText && answer) {
+                questionBank.push({ type: 'MC', question: qText, options, answer, explanation, keywords: qText.toLowerCase() });
+            }
+        });
+
+        // Parse Case Studies
+        const caseParts = text.split(/### Case \d+/).slice(1);
+        caseParts.forEach(part => {
+            const title = part.split('\n')[0].trim();
+            const scenario = part.match(/([\s\S]+?)(?=\*\*\(a\)\*\*)/)?.[1].trim();
+            const questions = Array.from(part.matchAll(/\*\*\(([a-z])\)\*\* ([\s\S]+?)(?=\n\*\*\([a-z]\)\*\*|\n\*\*Answer Key|$)/g)).map(m => m[2].trim());
+            const answerKey = part.split(/\*\*Answer Key:\*\*/i)[1]?.trim() || "See full guide.";
+            questionBank.push({ 
+                type: 'CASE', 
+                title, 
+                scenario, 
+                questions, 
+                answer: 'VIEW_KEY', 
+                explanation: answerKey, 
+                keywords: (title + scenario).toLowerCase() 
             });
         });
     }
 
     function generateChips() {
-        const topics = [...new Set(allQuestions.map(q => q.topic))];
-        const container = document.getElementById('topic-chips');
-        topics.forEach(t => {
-            const chip = document.createElement('div');
-            chip.className = 'chip';
-            chip.innerText = t;
-            chip.onclick
+        const categories = ["Visual", "Olfactory", "Auditory", "ALS", "MS", "Diabetes", "Endocrine", "Addison's", "Cushing's"];
+        const container = document.getElementById('chips-container');
+        categories.forEach(cat => {
+            const span = document.createElement('div');
+            span.className = 'chip';
+            span.innerText = cat;
+            span.onclick = () => { document.getElementById('user-query').value = `5 questions on ${cat}`; startQuiz(); };
+            container.appendChild(span);
+        });
+    }
+
+    function startQuiz() {
+        const query = document.getElementById('user-query').value.toLowerCase();
+        const numRequested = parseInt(query.match(/\d+/) || 5);
+        
+        let pool = questionBank.filter(q => query.split(' ').some(word => word.length > 2 && q.keywords.includes(word)));
+        if (pool.length === 0) pool = questionBank; // Fallback to random if no keyword found
+
+        currentQuiz = pool.sort(() => 0.5 - Math.random()).slice(0, numRequested);
+        
+        if (currentQuiz.length > 0) {
+            document.getElementById('setup-screen').classList.add('hidden');
+            document.getElementById('quiz-screen').classList.remove('hidden');
+            renderQuestion();
+        }
+    }
+
+    function renderQuestion() {
+        const q = currentQuiz[currentIdx];
+        const progress = ((currentIdx) / currentQuiz.length) * 100;
+        document.getElementById('progress-fill').style.width = `${progress}%`;
+        document.getElementById('q-header').innerText = `ITEM ${currentIdx + 1} OF ${currentQuiz.length} • ${q.type === 'MC' ? 'MULTIPLE CHOICE' : 'CASE STUDY'}`;
+        
+        const content = document.getElementById('q-content');
+        const options = document.getElementById('options-container');
+        content.innerHTML = q.type === 'CASE' ? `<div class="case-study-box"><strong>${q.title}</strong><br><br>${q.scenario}</div><p>${q.questions.join('<br><br>')}</p>` : `<h3>${q.question}</h3>`;
+        options.innerHTML = '';
+        document.getElementById('next-btn').classList.add('hidden');
+
+        if (q.type === 'MC') {
+            q.options.forEach((opt, i) => {
+                const btn = document.createElement('div');
+                btn.className = 'option';
+                btn.innerText = `${String.fromCharCode(65+i)}. ${opt}`;
+                btn.onclick = () => {
+                    document.querySelectorAll('.option').forEach(o => o.classList.remove('selected'));
+                    btn.classList.add('selected');
+                    userSelections[currentIdx] = String.fromCharCode(65+i);
+                    document.getElementById('next-btn').classList.remove('hidden');
+                };
+                options.appendChild(btn);
+            });
+        } else {
+            document.getElementById('next-btn').innerText = "Mark as Read / Next";
+            document.getElementById('next-btn').classList.remove('hidden');
+        }
+    }
+
+    function handleNext() {
+        if (currentIdx < currentQuiz.length - 1) {
+            currentIdx++;
+            renderQuestion();
+        } else {
+            showResults();
+        }
+    }
+
+    function showResults() {
+        document.getElementById('quiz-screen').classList.add('hidden');
+        document.getElementById('results-screen').classList.remove('hidden');
+        
+        let mcCorrect = 0;
+        let mcTotal = 0;
+        let html = '';
+
+        currentQuiz.forEach((q, i) => {
+            if (q.type === 'MC') {
+                mcTotal++;
+                const isCorrect = userSelections[i] === q.answer;
+                if (isCorrect) mcCorrect++;
+                html += `<div class="explanation"><strong>Q: ${q.question}</strong><br>Your: <span style="color:${isCorrect?'#4ade80':'#fb7185'}">${userSelections[i]}</span> | Correct: ${q.answer}<br><br>${q.explanation}</div>`;
+            } else {
+                html += `<div class="explanation"><strong>CASE: ${q.title}</strong><br><br><em>Answer Key:</em><br>${q.explanation.replace(/\n/g, '<br>')}</div>`;
+            }
+        });
+
+        document.getElementById('score-display').innerText = mcTotal > 0 ? `${mcCorrect} / ${mcTotal}` : "Review Complete";
+        document.getElementById('review-list').innerHTML = html;
+    }
+
+    loadData();
+</script>
+</body>
+</html>
