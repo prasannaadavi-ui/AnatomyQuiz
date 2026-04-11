@@ -3,21 +3,21 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Anatomy & Physiology Engine 2026</title>
+    <title>Neuroscience Quiz Engine 2026</title>
     <style>
-        :root { --bg: #0f172a; --card: #1e293b; --primary: #38bdf8; --text: #f1f5f9; --accent: #7dd3fc; }
-        body { font-family: 'Inter', system-ui, sans-serif; background: var(--bg); color: var(--text); margin: 0; padding: 20px; }
-        .container { max-width: 850px; margin: 40px auto; background: var(--card); padding: 40px; border-radius: 24px; border: 1px solid #334155; box-shadow: 0 25px 50px -12px rgba(0,0,0,0.5); }
+        :root { --bg: #0f172a; --card: #1e293b; --primary: #38bdf8; --text: #f1f5f9; --muted: #94a3b8; }
+        body { font-family: 'Inter', system-ui, sans-serif; background: var(--bg); color: var(--text); margin: 0; display: flex; justify-content: center; min-height: 100vh; }
+        .container { width: 100%; max-width: 800px; margin: 40px 20px; background: var(--card); padding: 40px; border-radius: 24px; border: 1px solid #334155; box-shadow: 0 25px 50px -12px rgba(0,0,0,0.5); }
         .search-box { background: #0f172a; border-radius: 16px; padding: 25px; border: 1px solid #334155; margin: 20px 0; }
         input { width: 100%; background: transparent; border: none; color: white; font-size: 1.2rem; outline: none; border-bottom: 2px solid #334155; padding: 10px 0; }
         input:focus { border-color: var(--primary); }
-        .chip { display: inline-block; background: #334155; padding: 8px 16px; border-radius: 20px; font-size: 0.85rem; cursor: pointer; margin: 5px; border: 1px solid transparent; }
+        .chip { display: inline-block; background: #334155; padding: 8px 16px; border-radius: 20px; font-size: 0.85rem; cursor: pointer; margin: 5px; transition: 0.2s; border: 1px solid transparent; }
         .chip:hover { border-color: var(--primary); background: #0f172a; }
         .hidden { display: none; }
         .option { background: #334155; padding: 18px; border-radius: 12px; margin-bottom: 12px; cursor: pointer; border: 2px solid transparent; transition: 0.2s; }
         .option.selected { border-color: var(--primary); background: #0f172a; }
-        button { background: var(--primary); color: #0f172a; border: none; padding: 16px; border-radius: 12px; font-weight: 800; cursor: pointer; width: 100%; font-size: 1rem; text-transform: uppercase; }
-        .explanation { background: #0f172a; padding: 25px; border-radius: 12px; margin-top: 20px; border-left: 5px solid var(--primary); line-height: 1.6; }
+        button { background: var(--primary); color: #0f172a; border: none; padding: 16px; border-radius: 12px; font-weight: 800; cursor: pointer; width: 100%; font-size: 1rem; text-transform: uppercase; margin-top: 10px; }
+        .explanation { background: #0f172a; padding: 25px; border-radius: 12px; margin-top: 20px; border-left: 5px solid var(--primary); }
         #progress-bar { height: 8px; background: #334155; border-radius: 4px; margin-bottom: 25px; overflow: hidden; }
         #progress-fill { height: 100%; background: var(--primary); width: 0%; transition: width 0.4s ease; }
     </style>
@@ -26,170 +26,127 @@
 
 <div class="container">
     <div id="setup-screen">
-        <h1>Anatomy Engine 2026</h1>
-        <p style="color:var(--accent); font-weight:600;">State Scope Study Portal</p>
+        <h1 style="margin:0;">Neuroscience Engine 2026</h1>
+        <p style="color:var(--muted); font-weight:600; font-size:0.9rem;">State-Level Study Portal</p>
         
-        <div class="search-box">
-            <span style="font-size: 0.75rem; color: var(--primary); font-weight: 800; text-transform: uppercase;">Build Custom Quiz</span>
-            <input type="text" id="user-query" placeholder='e.g. "10 questions on ALS" or "quiz me on vision"'>
-            <button onclick="startQuiz()" style="margin-top:20px;">Launch Session</button>
-        </div>
+        <div id="status" style="margin-top: 20px; font-size: 0.9rem; color: var(--primary);">Loading Question Bank...</div>
+        
+        <div id="controls" class="hidden">
+            <div class="search-box">
+                <span style="font-size: 0.75rem; color: var(--primary); font-weight: 800; text-transform: uppercase;">Build Custom Quiz</span>
+                <input type="text" id="ai-input" placeholder='e.g. "10 questions on endocrine" or "quiz me on vision"'>
+                <button onclick="startQuiz()">Launch Session</button>
+            </div>
 
-        <div id="quick-links">
-            <p style="font-size: 0.75rem; color: #94a3b8; font-weight: 800; margin-bottom:10px;">TOPICS FOUND IN BANK</p>
-            <div id="chips-container"></div>
+            <div>
+                <p style="font-size: 0.75rem; color: var(--muted); font-weight: 800; margin-bottom:10px;">POPULAR TOPICS</p>
+                <div id="topic-chips"></div>
+            </div>
         </div>
     </div>
 
     <div id="quiz-screen" class="hidden">
         <div id="progress-bar"><div id="progress-fill"></div></div>
-        <div id="q-header" style="font-size: 0.8rem; color: var(--accent); margin-bottom: 10px; font-weight:bold;"></div>
-        <div id="q-content"></div>
+        <div id="progress-text" style="font-size: 0.8rem; color: var(--muted); margin-bottom: 15px; font-weight: bold;"></div>
+        <h2 id="q-text" style="font-size: 1.3rem; margin-bottom: 25px;"></h2>
         <div id="options-container"></div>
-        <button id="next-btn" class="hidden" onclick="handleNext()" style="margin-top:20px;">Confirm Answer</button>
+        <button id="next-btn" class="hidden" onclick="handleNext()">Confirm Answer</button>
     </div>
 
     <div id="results-screen" class="hidden">
         <h2 style="text-align:center;">Session Review</h2>
-        <div id="score-display" style="text-align:center; font-size: 3rem; font-weight: 800; color: var(--primary); margin-bottom: 30px;"></div>
-        <div id="review-list"></div>
+        <div id="final-score" style="text-align:center; font-size: 2.5rem; font-weight: 800; color: var(--primary); margin-bottom: 30px;"></div>
+        <div id="review-area"></div>
         <button onclick="location.reload()">New Quiz</button>
     </div>
 </div>
 
 <script>
-    // YOUR CONTENT IS NOW EMBEDDED TO PREVENT LOADING ERRORS
-    const rawData = `
-# Division B Anatomy & Physiology
-## Complete State Scope Study Guide — 2026
----
-**Q1.** Which of the following is true of vision and phototransduction?
-- A. Damage to the optic chiasm will cause bitemporal hemianopia
-- B. GMP is converted to cGMP by phosphodiesterase
-- C. Transducin is a G-protein
-- D. Na+ channels open when rhodopsin's retinal is converted to its all-trans form
-**Answer: A**
-Damage to the optic chiasm affects crossing nasal fibers, leading to loss of the temporal visual fields (bitemporal hemianopia).
-
----
-**Q2.** Michelle cuts the fibers of Larry's left nasal optic nerve before the optic chiasm. What visual field defect results?
-- A. Loss of vision in left visual field in both eyes
-- B. Loss of vision in right visual field in both eyes
-- C. Loss of vision in left visual field in left eye
-- D. Loss of vision in right visual field in left eye
-**Answer: D**
-Nasal retinal fibers carry information from the temporal visual field. Cutting the left nasal fibers eliminates the left eye's temporal field.
-
----
-**Q14.** Which second messenger system is primarily involved in olfactory signal transduction?
-- A. IP3 pathway
-- B. cAMP pathway involving Golf protein
-- C. cGMP pathway
-- D. JAK-STAT pathway
-**Answer: B**
-Olfactory receptors are GPCRs that activate Golf, which stimulates adenylyl cyclase to produce cAMP.
-
----
-**Q23.** The utricle detects ____, the saccule detects ____, and the semicircular canals detect ____.
-- A. Angular; Vertical; Horizontal
-- B. Angular; Horizontal; Vertical
-- C. Vertical; Horizontal; Angular
-- D. Horizontal; Vertical; Angular
-**Answer: D**
-The utricle senses horizontal linear acceleration, the saccule senses vertical, and canals sense rotational.
-
----
-### Case 1 — ALS
-A 50-year-old man presents with difficulty with fine hand movements, twitching in his arms, and weakness in his ankles. He has no bladder control issues or sensory degeneration.
-**(a)** What disease does this patient have?
-**(b)** Describe the physiological effects.
-**Answer Key:**
-(a) ALS (Amyotrophic Lateral Sclerosis). (b) Progressive degeneration of both UMN and LMN.
-`;
-
-    let questionBank = [];
+    const RAW_URL = 'https://raw.githubusercontent.com/prasannaadavi-ui/AnatomyQuiz/main/state-test-bank.md';
+    let allQuestions = [];
     let currentQuiz = [];
     let currentIdx = 0;
-    let userSelections = [];
+    let score = 0;
+    let userAnswers = [];
 
-    function parseData() {
-        const mcParts = rawData.split(/---/).filter(p => p.includes('**Q'));
-        mcParts.forEach(part => {
-            const qText = part.match(/\*\*Q\d+\.\*\*([\s\S]+?)(?=- [A-D]|\*\*Answer)/i)?.[1].trim();
-            const options = Array.from(part.matchAll(/- ([A-D])\. ([\s\S]+?)(?=\n- [A-D]|\n\*\*Answer|$)/g)).map(m => m[2].trim());
-            const answer = part.match(/\*\*Answer:\s*([A-D])/i)?.[1];
-            const explanation = part.split(/\*\*Answer:.*?\*\*/i)[1]?.trim();
-            if (qText && answer) questionBank.push({ type: 'MC', question: qText, options, answer, explanation, keywords: qText.toLowerCase() });
+    async function init() {
+        try {
+            const response = await fetch(RAW_URL);
+            const text = await response.text();
+            parseMD(text);
+            
+            if (allQuestions.length > 0) {
+                document.getElementById('status').classList.add('hidden');
+                document.getElementById('controls').classList.remove('hidden');
+                renderChips();
+            } else {
+                document.getElementById('status').innerText = "Error: Found 0 questions. Please check Markdown format.";
+            }
+        } catch (e) {
+            document.getElementById('status').innerText = "Error: Could not connect to GitHub question bank.";
+        }
+    }
+
+    function parseMD(text) {
+        const sections = text.split(/##\s+/).filter(s => s.trim());
+        sections.forEach(section => {
+            const lines = section.split('\n');
+            const topic = lines[0].trim();
+            const qBlocks = section.split(/\n\d+\.\s+/).slice(1);
+            
+            qBlocks.forEach(block => {
+                const parts = block.split(/\n\s*[A-D]\.\s/);
+                if (parts.length < 5) return;
+                const answerMatch = block.match(/Answer:\s*([A-D])/i);
+                const explMatch = block.match(/Explanation:\s*([\s\S]*?)(?=\n\d+\.|$)/i);
+                if (answerMatch) {
+                    allQuestions.push({
+                        topic,
+                        question: parts[0].trim(),
+                        options: parts.slice(1, 5).map(o => o.split(/\n(Answer|Explanation):/i)[0].trim()),
+                        answer: answerMatch[1].toUpperCase(),
+                        explanation: explMatch ? explMatch[1].trim() : "Correct answer confirmed."
+                    });
+                }
+            });
         });
+    }
 
-        const caseParts = rawData.split(/### Case/).slice(1);
-        caseParts.forEach(part => {
-            const title = part.split('\n')[0].trim();
-            const scenario = part.match(/([\s\S]+?)(?=\*\*\(a\)\*\*)/)?.[1].trim();
-            const answerKey = part.split(/\*\*Answer Key:\*\*/i)[1]?.trim();
-            questionBank.push({ type: 'CASE', title, scenario, answer: 'KEY', explanation: answerKey, keywords: title.toLowerCase() });
-        });
-
-        const topics = ["Vision", "Olfactory", "Auditory", "ALS", "Endocrine"];
-        topics.forEach(t => {
+    function renderChips() {
+        const topics = [...new Set(allQuestions.map(q => q.topic))];
+        const container = document.getElementById('topic-chips');
+        topics.slice(0, 10).forEach(t => {
             const chip = document.createElement('div');
             chip.className = 'chip';
             chip.innerText = t;
-            chip.onclick = () => { document.getElementById('user-query').value = `5 questions on ${t}`; startQuiz(); };
-            document.getElementById('chips-container').appendChild(chip);
+            chip.onclick = () => { document.getElementById('ai-input').value = `10 questions on ${t}`; };
+            container.appendChild(chip);
         });
     }
 
     function startQuiz() {
-        const query = document.getElementById('user-query').value.toLowerCase();
-        const num = parseInt(query.match(/\d+/) || 5);
-        let pool = questionBank.filter(q => query.split(' ').some(w => w.length > 2 && q.keywords.includes(w)));
-        if (pool.length === 0) pool = questionBank;
-        currentQuiz = pool.sort(() => 0.5 - Math.random()).slice(0, num);
+        const input = document.getElementById('ai-input').value.toLowerCase();
+        const numMatch = input.match(/\d+/);
+        const count = numMatch ? parseInt(numMatch[0]) : 10;
+
+        let filtered = allQuestions.filter(q => 
+            input.includes(q.topic.toLowerCase()) || 
+            input.includes('everything') || 
+            input.includes('mixed')
+        );
+
+        if (filtered.length === 0) filtered = allQuestions;
+
+        currentQuiz = filtered.sort(() => 0.5 - Math.random()).slice(0, count);
+        
         document.getElementById('setup-screen').classList.add('hidden');
         document.getElementById('quiz-screen').classList.remove('hidden');
-        renderQuestion();
+        showQuestion();
     }
 
-    function renderQuestion() {
+    function showQuestion() {
         const q = currentQuiz[currentIdx];
-        document.getElementById('progress-fill').style.width = `${(currentIdx/currentQuiz.length)*100}%`;
-        document.getElementById('q-header').innerText = `ITEM ${currentIdx+1} OF ${currentQuiz.length}`;
-        const content = document.getElementById('q-content');
-        const options = document.getElementById('options-container');
-        
-        if (q.type === 'MC') {
-            content.innerHTML = `<h3>${q.question}</h3>`;
-            options.innerHTML = q.options.map((opt, i) => `<div class="option" onclick="selectOpt(this, '${String.fromCharCode(65+i)}')">${String.fromCharCode(65+i)}. ${opt}</div>`).join('');
-        } else {
-            content.innerHTML = `<div style="background:#0f172a;padding:20px;border-radius:12px;"><strong>${q.title}</strong><br><br>${q.scenario}</div>`;
-            options.innerHTML = `<button onclick="handleNext()">View Answer Key</button>`;
-        }
-        document.getElementById('next-btn').classList.add('hidden');
-    }
-
-    function selectOpt(el, val) {
-        document.querySelectorAll('.option').forEach(o => o.classList.remove('selected'));
-        el.classList.add('selected');
-        userSelections[currentIdx] = val;
-        document.getElementById('next-btn').classList.remove('hidden');
-    }
-
-    function handleNext() {
-        if (++currentIdx < currentQuiz.length) renderQuestion(); else showResults();
-    }
-
-    function showResults() {
-        document.getElementById('quiz-screen').classList.add('hidden');
-        document.getElementById('results-screen').classList.remove('hidden');
-        let html = '';
-        currentQuiz.forEach((q, i) => {
-            html += `<div class="explanation"><strong>${q.type==='MC'?'Q: '+q.question:'CASE: '+q.title}</strong><br><br>${q.explanation}</div>`;
-        });
-        document.getElementById('review-list').innerHTML = html;
-    }
-
-    parseData();
-</script>
-</body>
-</html>
+        const progress = ((currentIdx) / currentQuiz.length) * 100;
+        document.getElementById('progress-fill').style.width = `${progress}%`;
+        document.getElementById('progress-text').innerText = `STEP ${currentIdx + 1} OF ${currentQuiz.length} • ${q.topic.toUpperCase()}`;
+        document.getElementById('q-text').innerText = q.question;
