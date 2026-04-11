@@ -6,20 +6,100 @@
     <title>Neuroscience Engine 2026</title>
     <style>
         :root { --bg: #0f172a; --card: #1e293b; --primary: #38bdf8; --text: #f1f5f9; --muted: #94a3b8; }
-        body { font-family: 'Inter', system-ui, sans-serif; background: var(--bg); color: var(--text); margin: 0; display: flex; justify-content: center; min-height: 100vh; }
-        .container { width: 100%; max-width: 800px; margin: 40px 20px; background: var(--card); padding: 40px; border-radius: 24px; border: 1px solid #334155; box-shadow: 0 25px 50px -12px rgba(0,0,0,0.5); }
-        .search-box { background: #0f172a; border-radius: 16px; padding: 25px; border: 1px solid #334155; margin: 20px 0; }
-        input { width: 100%; background: transparent; border: none; color: white; font-size: 1.2rem; outline: none; border-bottom: 2px solid #334155; padding: 10px 0; }
+        body {
+            font-family: 'Inter', system-ui, sans-serif;
+            background: var(--bg);
+            color: var(--text);
+            margin: 0;
+            display: flex;
+            justify-content: center;
+            min-height: 100vh;
+        }
+        .container {
+            width: 100%;
+            max-width: 800px;
+            margin: 40px 20px;
+            background: var(--card);
+            padding: 40px;
+            border-radius: 24px;
+            border: 1px solid #334155;
+            box-shadow: 0 25px 50px -12px rgba(0,0,0,0.5);
+        }
+        .search-box {
+            background: #0f172a;
+            border-radius: 16px;
+            padding: 25px;
+            border: 1px solid #334155;
+            margin: 20px 0;
+        }
+        input {
+            width: 100%;
+            background: transparent;
+            border: none;
+            color: white;
+            font-size: 1.2rem;
+            outline: none;
+            border-bottom: 2px solid #334155;
+            padding: 10px 0;
+        }
         input:focus { border-color: var(--primary); }
-        .chip { display: inline-block; background: #334155; padding: 8px 16px; border-radius: 20px; font-size: 0.85rem; cursor: pointer; margin: 5px; transition: 0.2s; border: 1px solid transparent; }
+        .chip {
+            display: inline-block;
+            background: #334155;
+            padding: 8px 16px;
+            border-radius: 20px;
+            font-size: 0.85rem;
+            cursor: pointer;
+            margin: 5px;
+            transition: 0.2s;
+            border: 1px solid transparent;
+        }
         .chip:hover { border-color: var(--primary); background: #0f172a; }
         .hidden { display: none; }
-        .option { background: #334155; padding: 18px; border-radius: 12px; margin-bottom: 12px; cursor: pointer; border: 2px solid transparent; transition: 0.2s; }
+        .option {
+            background: #334155;
+            padding: 18px;
+            border-radius: 12px;
+            margin-bottom: 12px;
+            cursor: pointer;
+            border: 2px solid transparent;
+            transition: 0.2s;
+        }
         .option.selected { border-color: var(--primary); background: #0f172a; }
-        button { background: var(--primary); color: #0f172a; border: none; padding: 16px; border-radius: 12px; font-weight: 800; cursor: pointer; width: 100%; font-size: 1rem; text-transform: uppercase; margin-top: 10px; }
-        .explanation { background: #0f172a; padding: 25px; border-radius: 12px; margin-top: 20px; border-left: 5px solid var(--primary); line-height: 1.6; }
-        #progress-bar { height: 8px; background: #334155; border-radius: 4px; margin-bottom: 25px; overflow: hidden; }
-        #progress-fill { height: 100%; background: var(--primary); width: 0%; transition: width 0.4s ease; }
+        button {
+            background: var(--primary);
+            color: #0f172a;
+            border: none;
+            padding: 16px;
+            border-radius: 12px;
+            font-weight: 800;
+            cursor: pointer;
+            width: 100%;
+            font-size: 1rem;
+            text-transform: uppercase;
+            margin-top: 10px;
+        }
+        .explanation {
+            background: #0f172a;
+            padding: 25px;
+            border-radius: 12px;
+            margin-top: 20px;
+            border-left: 5px solid var(--primary);
+            line-height: 1.6;
+        }
+        #progress-bar {
+            height: 8px;
+            background: #334155;
+            border-radius: 4px;
+            margin-bottom: 25px;
+            overflow: hidden;
+        }
+        #progress-fill {
+            height: 100%;
+            background: var(--primary);
+            width: 0%;
+            transition: width 0.4s ease;
+        }
     </style>
 </head>
 <body>
@@ -77,34 +157,56 @@
                 document.getElementById('controls').classList.remove('hidden');
                 renderChips();
             } else {
-                document.getElementById('loading-status').innerText = "Bank loaded, but 0 questions found. Check format.";
+                document.getElementById('loading-status').innerText =
+                    "Bank loaded, but 0 questions found. Check format.";
             }
         } catch (e) {
-            document.getElementById('loading-status').innerText = "Connection Error. Check Raw URL access.";
+            document.getElementById('loading-status').innerText =
+                "Connection Error. Check Raw URL access.";
         }
     }
 
     function parseMD(text) {
-        const sections = text.split(/##\s+/).filter(s => s.trim());
+        // Split by H2 headings ("## Topic")
+        const sections = text.split(/^\s*##\s+/m).filter(s => s.trim());
         sections.forEach(section => {
             const lines = section.split('\n');
             const topic = lines[0].trim();
-            const qBlocks = section.split(/\n\d+\.\s+/).slice(1);
-            
+
+            // Numbered questions at start of line: "1. ", "2. ", etc.
+            const qBlocks = section.split(/\n\s*\d+\.\s+/).slice(1);
+
             qBlocks.forEach(block => {
+                // Split into question + choices A–D
                 const parts = block.split(/\n\s*[A-D]\.\s/);
-                if (parts.length < 5) return;
+                if (parts.length < 2) return;
+
+                const questionText = parts[0].trim();
+                if (!questionText) return;
+
                 const ansMatch = block.match(/Answer:\s*([A-D])/i);
-                const explMatch = block.match(/Explanation:\s*([\s\S]*?)(?=\n\d+\.|$)/i);
-                if (ansMatch) {
-                    allQuestions.push({
-                        topic,
-                        question: parts[0].trim(),
-                        options: parts.slice(1, 5).map(o => o.split(/\n(Answer|Explanation):/i)[0].trim().replace(/^[A-D]\.\s/, '')),
-                        answer: ansMatch[1].toUpperCase(),
-                        explanation: explMatch ? explMatch[1].trim() : "Correct answer confirmed."
-                    });
+                if (!ansMatch) return; // skip non-MCQ blocks
+
+                const explMatch = block.match(
+                    /Explanation:\s*([\s\S]*?)(?=\n\s*\d+\.\s+|^##\s+|$)/mi
+                );
+
+                const options = [];
+                for (let i = 1; i < parts.length && i <= 4; i++) {
+                    const raw = parts[i]
+                        .split(/\n(Answer|Explanation):/i)[0]
+                        .trim();
+                    if (raw) options.push(raw);
                 }
+                if (options.length < 2) return;
+
+                allQuestions.push({
+                    topic,
+                    question: questionText,
+                    options,
+                    answer: ansMatch[1].toUpperCase(),
+                    explanation: explMatch ? explMatch[1].trim() : "Correct answer confirmed."
+                });
             });
         });
     }
@@ -112,22 +214,34 @@
     function renderChips() {
         const topics = [...new Set(allQuestions.map(q => q.topic))];
         const container = document.getElementById('topic-chips');
+        container.innerHTML = '';
         topics.slice(0, 15).forEach(t => {
             const chip = document.createElement('div');
             chip.className = 'chip';
             chip.innerText = t;
-            chip.onclick = () => { document.getElementById('ai-input').value = `10 questions on ${t}`; startQuiz(); };
+            chip.onclick = () => {
+                document.getElementById('ai-input').value = `10 questions on ${t}`;
+                startQuiz();
+            };
             container.appendChild(chip);
         });
     }
 
     function startQuiz() {
         const input = document.getElementById('ai-input').value.toLowerCase();
-        const num = parseInt(input.match(/\d+/) || 10);
-        let pool = allQuestions.filter(q => input.includes(q.topic.toLowerCase()) || input.includes('everything') || input.includes('all'));
+        const numMatch = input.match(/\d+/);
+        const num = numMatch ? parseInt(numMatch[0], 10) : 10;
+
+        let pool = allQuestions.filter(q =>
+            input.includes(q.topic.toLowerCase()) ||
+            input.includes('everything') ||
+            input.includes('all')
+        );
         if (pool.length === 0) pool = allQuestions;
 
         currentQuiz = pool.sort(() => 0.5 - Math.random()).slice(0, num);
+        currentIdx = 0;
+        userAnswers = new Array(currentQuiz.length);
         document.getElementById('setup-screen').classList.add('hidden');
         document.getElementById('quiz-screen').classList.remove('hidden');
         renderQuestion();
@@ -135,17 +249,22 @@
 
     function renderQuestion() {
         const q = currentQuiz[currentIdx];
-        document.getElementById('progress-fill').style.width = `${(currentIdx / currentQuiz.length) * 100}%`;
-        document.getElementById('q-header').innerText = `STEP ${currentIdx + 1} OF ${currentQuiz.length} • ${q.topic.toUpperCase()}`;
+        const progress = (currentIdx / currentQuiz.length) * 100;
+        document.getElementById('progress-fill').style.width = `${progress}%`;
+        document.getElementById('q-header').innerText =
+            `STEP ${currentIdx + 1} OF ${currentQuiz.length} • ${q.topic.toUpperCase()}`;
         document.getElementById('q-text').innerText = q.question;
+
         const container = document.getElementById('options-container');
         container.innerHTML = '';
         document.getElementById('next-btn').classList.add('hidden');
 
-        ['A','B','C','D'].forEach((letter, i) => {
+        const letters = ['A', 'B', 'C', 'D'];
+        q.options.forEach((opt, i) => {
+            const letter = letters[i];
             const div = document.createElement('div');
             div.className = 'option';
-            div.innerText = `${letter}. ${q.options[i]}`;
+            div.innerText = `${letter}. ${opt}`;
             div.onclick = () => {
                 document.querySelectorAll('.option').forEach(o => o.classList.remove('selected'));
                 div.classList.add('selected');
@@ -157,7 +276,12 @@
     }
 
     function handleNext() {
-        if (++currentIdx < currentQuiz.length) renderQuestion(); else showResults();
+        if (++currentIdx < currentQuiz.length) {
+            renderQuestion();
+        } else {
+            document.getElementById('progress-fill').style.width = '100%';
+            showResults();
+        }
     }
 
     function showResults() {
@@ -165,12 +289,24 @@
         document.getElementById('results-screen').classList.remove('hidden');
         let correctCount = 0;
         let html = '';
+
         currentQuiz.forEach((q, i) => {
             const isCorrect = userAnswers[i] === q.answer;
-            if(isCorrect) correctCount++;
-            html += `<div class="explanation"><strong>Q${i+1}: ${q.question}</strong><br>Result: <span style="color:${isCorrect?'#4ade80':'#fb7185'}">${isCorrect?'Correct':'Incorrect'}</span> | Correct: ${q.answer}<br><br><em>${q.explanation}</em></div>`;
+            if (isCorrect) correctCount++;
+            html += `
+                <div class="explanation">
+                    <strong>Q${i+1}: ${q.question}</strong><br>
+                    Result:
+                    <span style="color:${isCorrect ? '#4ade80' : '#fb7185'}">
+                        ${isCorrect ? 'Correct' : 'Incorrect'}
+                    </span>
+                    | Correct: ${q.answer}<br><br>
+                    <em>${q.explanation}</em>
+                </div>`;
         });
-        document.getElementById('score-display').innerText = `${correctCount} / ${currentQuiz.length}`;
+
+        document.getElementById('score-display').innerText =
+            `${correctCount} / ${currentQuiz.length}`;
         document.getElementById('review-area').innerHTML = html;
     }
 
