@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Neuroscience Quiz Engine 2026</title>
+    <title>Neuroscience Engine 2026</title>
     <style>
         :root { --bg: #0f172a; --card: #1e293b; --primary: #38bdf8; --text: #f1f5f9; --muted: #94a3b8; }
         body { font-family: 'Inter', system-ui, sans-serif; background: var(--bg); color: var(--text); margin: 0; display: flex; justify-content: center; min-height: 100vh; }
@@ -27,126 +27,13 @@
 <div class="container">
     <div id="setup-screen">
         <h1 style="margin:0;">Neuroscience Engine 2026</h1>
-        <p style="color:var(--muted); font-weight:600; font-size:0.9rem;">State-Level Study Portal</p>
-        
-        <div id="status" style="margin-top: 20px; font-size: 0.9rem; color: var(--primary);">Loading Question Bank...</div>
+        <p id="loading-status" style="margin-top: 20px; color: var(--primary);">Attempting to connect to bank...</p>
         
         <div id="controls" class="hidden">
             <div class="search-box">
                 <span style="font-size: 0.75rem; color: var(--primary); font-weight: 800; text-transform: uppercase;">Build Custom Quiz</span>
-                <input type="text" id="ai-input" placeholder='e.g. "10 questions on endocrine" or "quiz me on vision"'>
+                <input type="text" id="ai-input" placeholder='e.g. "10 questions on endocrine"'>
                 <button onclick="startQuiz()">Launch Session</button>
             </div>
-
-            <div>
-                <p style="font-size: 0.75rem; color: var(--muted); font-weight: 800; margin-bottom:10px;">POPULAR TOPICS</p>
-                <div id="topic-chips"></div>
-            </div>
-        </div>
-    </div>
-
-    <div id="quiz-screen" class="hidden">
-        <div id="progress-bar"><div id="progress-fill"></div></div>
-        <div id="progress-text" style="font-size: 0.8rem; color: var(--muted); margin-bottom: 15px; font-weight: bold;"></div>
-        <h2 id="q-text" style="font-size: 1.3rem; margin-bottom: 25px;"></h2>
-        <div id="options-container"></div>
-        <button id="next-btn" class="hidden" onclick="handleNext()">Confirm Answer</button>
-    </div>
-
-    <div id="results-screen" class="hidden">
-        <h2 style="text-align:center;">Session Review</h2>
-        <div id="final-score" style="text-align:center; font-size: 2.5rem; font-weight: 800; color: var(--primary); margin-bottom: 30px;"></div>
-        <div id="review-area"></div>
-        <button onclick="location.reload()">New Quiz</button>
-    </div>
-</div>
-
-<script>
-    const RAW_URL = 'https://raw.githubusercontent.com/prasannaadavi-ui/AnatomyQuiz/main/state-test-bank.md';
-    let allQuestions = [];
-    let currentQuiz = [];
-    let currentIdx = 0;
-    let score = 0;
-    let userAnswers = [];
-
-    async function init() {
-        try {
-            const response = await fetch(RAW_URL);
-            const text = await response.text();
-            parseMD(text);
-            
-            if (allQuestions.length > 0) {
-                document.getElementById('status').classList.add('hidden');
-                document.getElementById('controls').classList.remove('hidden');
-                renderChips();
-            } else {
-                document.getElementById('status').innerText = "Error: Found 0 questions. Please check Markdown format.";
-            }
-        } catch (e) {
-            document.getElementById('status').innerText = "Error: Could not connect to GitHub question bank.";
-        }
-    }
-
-    function parseMD(text) {
-        const sections = text.split(/##\s+/).filter(s => s.trim());
-        sections.forEach(section => {
-            const lines = section.split('\n');
-            const topic = lines[0].trim();
-            const qBlocks = section.split(/\n\d+\.\s+/).slice(1);
-            
-            qBlocks.forEach(block => {
-                const parts = block.split(/\n\s*[A-D]\.\s/);
-                if (parts.length < 5) return;
-                const answerMatch = block.match(/Answer:\s*([A-D])/i);
-                const explMatch = block.match(/Explanation:\s*([\s\S]*?)(?=\n\d+\.|$)/i);
-                if (answerMatch) {
-                    allQuestions.push({
-                        topic,
-                        question: parts[0].trim(),
-                        options: parts.slice(1, 5).map(o => o.split(/\n(Answer|Explanation):/i)[0].trim()),
-                        answer: answerMatch[1].toUpperCase(),
-                        explanation: explMatch ? explMatch[1].trim() : "Correct answer confirmed."
-                    });
-                }
-            });
-        });
-    }
-
-    function renderChips() {
-        const topics = [...new Set(allQuestions.map(q => q.topic))];
-        const container = document.getElementById('topic-chips');
-        topics.slice(0, 10).forEach(t => {
-            const chip = document.createElement('div');
-            chip.className = 'chip';
-            chip.innerText = t;
-            chip.onclick = () => { document.getElementById('ai-input').value = `10 questions on ${t}`; };
-            container.appendChild(chip);
-        });
-    }
-
-    function startQuiz() {
-        const input = document.getElementById('ai-input').value.toLowerCase();
-        const numMatch = input.match(/\d+/);
-        const count = numMatch ? parseInt(numMatch[0]) : 10;
-
-        let filtered = allQuestions.filter(q => 
-            input.includes(q.topic.toLowerCase()) || 
-            input.includes('everything') || 
-            input.includes('mixed')
-        );
-
-        if (filtered.length === 0) filtered = allQuestions;
-
-        currentQuiz = filtered.sort(() => 0.5 - Math.random()).slice(0, count);
-        
-        document.getElementById('setup-screen').classList.add('hidden');
-        document.getElementById('quiz-screen').classList.remove('hidden');
-        showQuestion();
-    }
-
-    function showQuestion() {
-        const q = currentQuiz[currentIdx];
-        const progress = ((currentIdx) / currentQuiz.length) * 100;
-        document.getElementById('progress-fill').style.width = `${progress}%`;
-        document.getElementById('progress-text').innerText = `STEP ${currentIdx + 1} OF ${currentQuiz.length} • ${q.topic.toUpperCase()}`;
-        document.getElementById('q-text').innerText = q.question;
+            <div id="quick-links">
+                <p style="font-size: 0.75
