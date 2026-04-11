@@ -1,316 +1,334 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Neuroscience Engine 2026</title>
-    <style>
-        :root { --bg: #0f172a; --card: #1e293b; --primary: #38bdf8; --text: #f1f5f9; --muted: #94a3b8; }
-        body {
-            font-family: 'Inter', system-ui, sans-serif;
-            background: var(--bg);
-            color: var(--text);
-            margin: 0;
-            display: flex;
-            justify-content: center;
-            min-height: 100vh;
-        }
-        .container {
-            width: 100%;
-            max-width: 800px;
-            margin: 40px 20px;
-            background: var(--card);
-            padding: 40px;
-            border-radius: 24px;
-            border: 1px solid #334155;
-            box-shadow: 0 25px 50px -12px rgba(0,0,0,0.5);
-        }
-        .search-box {
-            background: #0f172a;
-            border-radius: 16px;
-            padding: 25px;
-            border: 1px solid #334155;
-            margin: 20px 0;
-        }
-        input {
-            width: 100%;
-            background: transparent;
-            border: none;
-            color: white;
-            font-size: 1.2rem;
-            outline: none;
-            border-bottom: 2px solid #334155;
-            padding: 10px 0;
-        }
-        input:focus { border-color: var(--primary); }
-        .chip {
-            display: inline-block;
-            background: #334155;
-            padding: 8px 16px;
-            border-radius: 20px;
-            font-size: 0.85rem;
-            cursor: pointer;
-            margin: 5px;
-            transition: 0.2s;
-            border: 1px solid transparent;
-        }
-        .chip:hover { border-color: var(--primary); background: #0f172a; }
-        .hidden { display: none; }
-        .option {
-            background: #334155;
-            padding: 18px;
-            border-radius: 12px;
-            margin-bottom: 12px;
-            cursor: pointer;
-            border: 2px solid transparent;
-            transition: 0.2s;
-        }
-        .option.selected { border-color: var(--primary); background: #0f172a; }
-        button {
-            background: var(--primary);
-            color: #0f172a;
-            border: none;
-            padding: 16px;
-            border-radius: 12px;
-            font-weight: 800;
-            cursor: pointer;
-            width: 100%;
-            font-size: 1rem;
-            text-transform: uppercase;
-            margin-top: 10px;
-        }
-        .explanation {
-            background: #0f172a;
-            padding: 25px;
-            border-radius: 12px;
-            margin-top: 20px;
-            border-left: 5px solid var(--primary);
-            line-height: 1.6;
-        }
-        #progress-bar {
-            height: 8px;
-            background: #334155;
-            border-radius: 4px;
-            margin-bottom: 25px;
-            overflow: hidden;
-        }
-        #progress-fill {
-            height: 100%;
-            background: var(--primary);
-            width: 0%;
-            transition: width 0.4s ease;
-        }
-    </style>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Neuroscience Engine 2026</title>
+<style>
+  :root{--bg:#0f172a;--card:#1e293b;--primary:#38bdf8;--text:#f1f5f9;--muted:#94a3b8}
+  body{font-family:'Inter',system-ui,sans-serif;background:var(--bg);color:var(--text);margin:0;display:flex;justify-content:center;min-height:100vh}
+  .container{width:100%;max-width:800px;margin:40px 20px;background:var(--card);padding:40px;border-radius:24px;border:1px solid #334155;box-shadow:0 25px 50px -12px rgba(0,0,0,.5)}
+  .search-box{background:#0f172a;border-radius:16px;padding:25px;border:1px solid #334155;margin:20px 0}
+  input{width:100%;background:transparent;border:none;color:white;font-size:1.2rem;outline:none;border-bottom:2px solid #334155;padding:10px 0;box-sizing:border-box}
+  input:focus{border-color:var(--primary)}
+  .chip{display:inline-block;background:#334155;padding:8px 16px;border-radius:20px;font-size:.85rem;cursor:pointer;margin:5px;transition:.2s;border:1px solid transparent}
+  .chip:hover{border-color:var(--primary);background:#0f172a}
+  .hidden{display:none}
+  .option{background:#334155;padding:18px;border-radius:12px;margin-bottom:12px;cursor:pointer;border:2px solid transparent;transition:.2s}
+  .option:hover{border-color:#475569}
+  .option.selected{border-color:var(--primary);background:#0f172a}
+  .option.correct{border-color:#4ade80;background:#052e16}
+  .option.wrong{border-color:#fb7185;background:#2d0a0a}
+  button{background:var(--primary);color:#0f172a;border:none;padding:16px;border-radius:12px;font-weight:800;cursor:pointer;width:100%;font-size:1rem;text-transform:uppercase;margin-top:10px}
+  button:hover{opacity:.9}
+  .explanation{background:#0f172a;padding:25px;border-radius:12px;margin-top:20px;border-left:5px solid var(--primary);line-height:1.6}
+  #progress-bar{height:8px;background:#334155;border-radius:4px;margin-bottom:25px;overflow:hidden}
+  #progress-fill{height:100%;background:var(--primary);width:0%;transition:width .4s ease}
+  .score-badge{text-align:center;font-size:3rem;font-weight:800;color:var(--primary);margin:20px 0}
+  .stat{display:inline-block;background:#334155;padding:8px 20px;border-radius:20px;margin:5px;font-size:.9rem}
+</style>
 </head>
 <body>
-
 <div class="container">
-    <div id="setup-screen">
-        <h1 style="margin:0;">Neuroscience Engine 2026</h1>
-        <p id="loading-status" style="margin-top: 20px; color: var(--primary);">Synchronizing with Question Bank...</p>
-        
-        <div id="controls" class="hidden">
-            <div class="search-box">
-                <span style="font-size: 0.75rem; color: var(--primary); font-weight: 800; text-transform: uppercase;">Build Custom Quiz</span>
-                <input type="text" id="ai-input" placeholder='e.g. "10 questions on endocrine"'>
-                <button onclick="startQuiz()">Launch Session</button>
-            </div>
-            <div id="quick-links">
-                <p style="font-size: 0.75rem; color: var(--muted); font-weight: 800; margin-bottom:10px;">TOPICS DETECTED</p>
-                <div id="topic-chips"></div>
-            </div>
-        </div>
-    </div>
 
-    <div id="quiz-screen" class="hidden">
-        <div id="progress-bar"><div id="progress-fill"></div></div>
-        <div id="q-header" style="font-size: 0.8rem; color: var(--primary); margin-bottom: 10px; font-weight:bold;"></div>
-        <h2 id="q-text" style="font-size: 1.3rem; margin-bottom: 25px;"></h2>
-        <div id="options-container"></div>
-        <button id="next-btn" class="hidden" onclick="handleNext()">Confirm Answer</button>
+  <div id="setup-screen">
+    <h1 style="margin:0">🧠 Neuroscience Engine 2026</h1>
+    <p style="color:var(--muted);margin-top:8px">Division B · State Scope · <span id="q-count" style="color:var(--primary)">Loading...</span></p>
+    <div class="search-box">
+      <span style="font-size:.75rem;color:var(--primary);font-weight:800;text-transform:uppercase">Build Custom Quiz</span>
+      <input type="text" id="ai-input" placeholder='e.g. "10 questions on endocrine" or "all visual pathways"'>
+      <button onclick="startQuiz()">🚀 Launch Session</button>
     </div>
+    <div id="quick-links">
+      <p style="font-size:.75rem;color:var(--muted);font-weight:800;margin-bottom:10px">QUICK TOPICS</p>
+      <div id="topic-chips"></div>
+    </div>
+  </div>
 
-    <div id="results-screen" class="hidden">
-        <h2 style="text-align:center;">Session Review</h2>
-        <div id="score-display" style="text-align:center; font-size: 3rem; font-weight: 800; color: var(--primary); margin-bottom: 30px;"></div>
-        <div id="review-area"></div>
-        <button onclick="location.reload()">New Quiz</button>
-    </div>
+  <div id="quiz-screen" class="hidden">
+    <div id="progress-bar"><div id="progress-fill"></div></div>
+    <div id="q-header" style="font-size:.8rem;color:var(--primary);margin-bottom:10px;font-weight:bold"></div>
+    <h2 id="q-text" style="font-size:1.2rem;margin-bottom:25px;line-height:1.5"></h2>
+    <div id="options-container"></div>
+    <div id="explanation-box" class="explanation hidden"></div>
+    <button id="next-btn" class="hidden" onclick="handleNext()">Next Question →</button>
+  </div>
+
+  <div id="results-screen" class="hidden">
+    <h2 style="text-align:center">📊 Session Complete</h2>
+    <div class="score-badge" id="score-display"></div>
+    <div style="text-align:center;margin-bottom:30px" id="stat-row"></div>
+    <div id="review-area"></div>
+    <button onclick="location.reload()">🔄 New Quiz</button>
+  </div>
+
 </div>
-
 <script>
-    const GITHUB_RAW = 'https://raw.githubusercontent.com/prasannaadavi-ui/AnatomyQuiz/refs/heads/main/state-test-bank.md';
-    let allQuestions = [];
-    let currentQuiz = [];
-    let currentIdx = 0;
-    let userAnswers = [];
+// ── EMBEDDED QUESTION BANK ─────────────────────────────────────────────────
+const RAW_QUESTIONS = [
+  // VISUAL PATHWAYS
+  {topic:"Visual Pathways",question:"Which visual field defect results from damage to the optic chiasm?",options:["Left monocular blindness","Right homonymous hemianopia","Bitemporal hemianopia","Left homonymous hemianopia"],answer:"C",explanation:"The optic chiasm is where nasal retinal fibers from both eyes cross. Damage eliminates both temporal visual fields — bitemporal hemianopia."},
+  {topic:"Visual Pathways",question:"Damage to the left optic nerve produces which defect?",options:["Bitemporal hemianopia","Left monocular blindness","Left homonymous hemianopia","Right superior quadrantanopia"],answer:"B",explanation:"The optic nerve carries all information from one eye. A left optic nerve lesion = complete loss of vision in the left eye only."},
+  {topic:"Visual Pathways",question:"A lesion of the right optic tract causes:",options:["Right monocular vision loss","Left homonymous hemianopia","Right homonymous hemianopia","Bitemporal hemianopia"],answer:"B",explanation:"The right optic tract carries right visual field info from both eyes. A lesion causes left homonymous hemianopia."},
+  {topic:"Visual Pathways",question:"A lesion of Meyer's loop (inferior optic radiation in the temporal lobe) causes:",options:["Contralateral inferior quadrantanopia","Contralateral superior quadrantanopia","Ipsilateral superior quadrantanopia","Bitemporal hemianopia"],answer:"B",explanation:"Meyer's loop carries superior visual field fibers. A lesion causes 'pie in the sky' — contralateral superior quadrantanopia."},
+  {topic:"Visual Pathways",question:"Which correctly describes the visual pathway from retina to cortex?",options:["Retina→Optic chiasm→Optic nerve→LGN→Visual cortex","Retina→Optic nerve→Optic chiasm→Optic tract→LGN→Visual cortex","Retina→LGN→Optic nerve→Optic tract→Visual cortex","Retina→Optic tract→Optic chiasm→Visual cortex→LGN"],answer:"B",explanation:"Retina → Optic Nerve → Optic Chiasm → Optic Tract → LGN → Visual Cortex is the correct sequence."},
+  {topic:"Visual Pathways",question:"In the dark, photoreceptors exhibit:",options:["Low cGMP; Na+/Ca2+ channels closed; hyperpolarized","High cGMP; Na+/Ca2+ channels open; depolarized","High cAMP; K+ channels open; hyperpolarized","Low Ca2+; glutamate release decreased"],answer:"B",explanation:"In the dark, cGMP is HIGH, keeping CNG channels OPEN. This allows Na+/Ca2+ influx (dark current), keeping the cell depolarized and releasing glutamate continuously."},
+  {topic:"Visual Pathways",question:"Photon absorption activates transducin → PDE6 → lowers cGMP. How does this alter the photoreceptor?",options:["Depolarization via increased Na+ entry","Depolarization via decreased Ca2+ extrusion","Hyperpolarization via closure of cGMP-gated channels","Hyperpolarization via activation of voltage-gated Na+ channels"],answer:"C",explanation:"Light → transducin → PDE6 hydrolyzes cGMP → CNG channels CLOSE → no Na+/Ca2+ influx → hyperpolarization → less glutamate released."},
+  {topic:"Visual Pathways",question:"In the dark, the principal neurotransmitter released by photoreceptors and its effect on ON-bipolar cells:",options:["Glutamate; sign-inverting via mGluR6 — hyperpolarizes ON-bipolar cells","GABA; directly inhibits bipolar cells","Glycine; depolarizes ON-bipolar cells","Acetylcholine; activates nicotinic receptors on bipolar cells"],answer:"A",explanation:"In dark, photoreceptors continuously release glutamate. For ON-bipolar cells, glutamate is sign-inverting (inhibitory) via mGluR6 — keeping them hyperpolarized in the dark."},
+  {topic:"Visual Pathways",question:"Which visual field defect results from damage to both banks of the right calcarine fissure (V1)?",options:["Right monocular blindness","Right homonymous hemianopia","Left homonymous hemianopia with possible macular sparing","Bitemporal hemianopia"],answer:"C",explanation:"Right V1 processes the left visual field. Lesion = left homonymous hemianopia. Macular sparing occurs because the macula has dual blood supply."},
+  {topic:"Visual Pathways",question:"How does the LGN keep input from both eyes separate?",options:["Both eyes' information is mixed in all six layers","The LGN has six layers, alternating input from each eye","Cells receive input from one eye but are not laminar","Right LGN receives only from left eye"],answer:"B",explanation:"The LGN has 6 layers. Layers 1,4,6 receive input from the contralateral eye; layers 2,3,5 from the ipsilateral eye. Information is kept strictly segregated."},
+  {topic:"Visual Pathways",question:"TRUE or FALSE: All information from the right eye is processed in the left hemisphere.",options:["True","False"],answer:"B",explanation:"FALSE. Only the nasal retinal fibers of the right eye cross at the chiasm. The temporal retinal fibers of the right eye remain ipsilateral (processed in right hemisphere). The entire right VISUAL FIELD goes to the left hemisphere, but not all from the right eye."},
+  {topic:"Visual Pathways",question:"Which best describes the underlying defect in astigmatism?",options:["The lens loses elasticity and cannot accommodate for near vision","The cornea or lens has irregular curvature causing light to focus at multiple points","The eyeball is too short causing light to focus behind the retina","Increased intraocular pressure damages the optic nerve"],answer:"B",explanation:"Astigmatism occurs when the cornea/lens is not perfectly spherical, causing blurred vision at all distances because light refracts unevenly."},
+  {topic:"Visual Pathways",question:"A craniopharyngioma compresses the optic chiasm from above. Which defect is most classic?",options:["Bitemporal hemianopia","Right homonymous hemianopia","Left superior quadrantanopia","Monocular scotoma"],answer:"A",explanation:"The chiasm sits directly below the pituitary/hypothalamic region. Compression damages crossing nasal fibers → bitemporal hemianopia."},
+  {topic:"Visual Pathways",question:"TRUE or FALSE: The fovea contains more rods than cones.",options:["True","False"],answer:"B",explanation:"FALSE. The fovea is ALL cones — it is the region of highest visual acuity. Rods are absent at the fovea and most numerous in the peripheral retina."},
+  {topic:"Visual Pathways",question:"V1 vs extrastriate cortex (V2–V5): which statement is correct?",options:["V1 responds to all visual input; extrastriate responds only to cones","V1 processes simple features (orientation, direction); extrastriate processes complex input like objects, color, motion","V1 sends output to extrastriate but receives none back","V1 separates 'where' and 'what' pathways; extrastriate does not"],answer:"B",explanation:"V1 detects basic features (edges, orientation, direction). Extrastriate areas (V4 = color, V5/MT = motion, IT = object recognition) handle increasingly complex processing."},
 
-    async function init() {
-        try {
-            const response = await fetch(GITHUB_RAW);
-            if (!response.ok) throw new Error("Fetch failed");
-            const text = await response.text();
-            parseMD(text);
-            
-            if (allQuestions.length > 0) {
-                document.getElementById('loading-status').classList.add('hidden');
-                document.getElementById('controls').classList.remove('hidden');
-                renderChips();
-            } else {
-                document.getElementById('loading-status').innerText =
-                    "Bank loaded, but 0 questions found. Check format.";
-            }
-        } catch (e) {
-            document.getElementById('loading-status').innerText =
-                "Connection Error. Check Raw URL access.";
-        }
-    }
+  // PHOTOTRANSDUCTION
+  {topic:"Phototransduction",question:"Which vision disorder is associated with Vitamin A deficiency?",options:["Myopia","Hyperopia","Presbyopia","Nyctalopia (night blindness)"],answer:"D",explanation:"Vitamin A is converted to retinal, the chromophore in rhodopsin. Without it, rod photopigment cannot be synthesized → night blindness (nyctalopia)."},
+  {topic:"Phototransduction",question:"Which retinal cells perform lateral inhibition to enhance contrast detection?",options:["Bipolar cells","Ganglion cells","Horizontal cells","Amacrine cells"],answer:"C",explanation:"Horizontal cells connect photoreceptors laterally and mediate lateral inhibition, which sharpens edges and enhances contrast in the visual image."},
+  {topic:"Phototransduction",question:"A person looks directly at a dim star but cannot see it, yet sees it when looking slightly to the side. Why?",options:["The fovea contains mostly cones, which are ineffective in low light","Rods are concentrated in the fovea","The optic disc is at the center of gaze","The iris blocks central vision in dark conditions"],answer:"A",explanation:"The fovea has only cones, which require bright light. Rods are most dense in the periphery (~20° from fovea) and are far more sensitive to dim light — hence peripheral vision is better in darkness."},
+  {topic:"Phototransduction",question:"Glaucoma is caused by:",options:["Lens opacity","Degeneration of rod photoreceptors","Increased intraocular pressure damaging the optic nerve","Irregular corneal curvature"],answer:"C",explanation:"Glaucoma = elevated intraocular pressure (usually due to impaired aqueous humor drainage through the trabecular meshwork) → compresses and damages the optic nerve head."},
 
-    function parseMD(text) {
-        // Split by H2 headings ("## Topic")
-        const sections = text.split(/^\s*##\s+/m).filter(s => s.trim());
-        sections.forEach(section => {
-            const lines = section.split('\n');
-            const topic = lines[0].trim();
+  // OLFACTORY SYSTEM
+  {topic:"Olfactory System",question:"Which second messenger system is primarily involved in olfactory signal transduction?",options:["IP3 pathway","cAMP pathway involving Golf protein","cGMP pathway","JAK-STAT pathway"],answer:"B",explanation:"Olfactory receptors are GPCRs coupled to Golf. Odorant binding → Golf activates adenylyl cyclase III → cAMP rises → CNG channels open → depolarization."},
+  {topic:"Olfactory System",question:"Which statement about the olfactory pathway is uniquely correct compared to other special senses?",options:["Projects first to thalamus","Regenerating receptor neurons from basal cells","Uses primarily glycine as neurotransmitter","Travels exclusively in CN V"],answer:"B",explanation:"Olfactory receptor neurons are unique — they regenerate from basal stem cells every ~30–60 days. Also uniquely, olfaction bypasses the thalamus, projecting directly to the piriform cortex and limbic system."},
+  {topic:"Olfactory System",question:"An odorant must be volatile because:",options:["Volatile molecules are large and water-soluble, binding mucous glycoproteins","Volatile molecules have low vapor pressure and remain in solution","Volatile molecules readily enter the gas phase, enabling them to reach olfactory mucus and bind GPCRs","Volatile molecules are lipid-soluble and cross the epithelium directly"],answer:"C",explanation:"For smell to occur, odorant molecules must enter the air (be volatile), travel to the nasal cavity, dissolve in the olfactory mucus, and bind to GPCR receptors on olfactory neurons."},
+  {topic:"Olfactory System",question:"TRUE or FALSE: Olfactory inputs are sent to the cerebrum through the thalamus.",options:["True","False"],answer:"B",explanation:"FALSE. Olfaction is the ONLY special sense that bypasses the thalamus. Olfactory signals go directly from the olfactory bulb to the piriform cortex and limbic structures (amygdala, hippocampus)."},
+  {topic:"Olfactory System",question:"Which principle allows discrimination of thousands of different odors?",options:["Each odorant binds a single unique receptor","Each receptor detects only one specific odorant","Discrimination depends solely on concentration","Odor identity is encoded by a combinatorial pattern of receptor activation"],answer:"D",explanation:"With ~400 types of olfactory receptors, each odorant activates a unique COMBINATION of receptors. The combinatorial code allows discrimination of >1 trillion different odors."},
+  {topic:"Olfactory System",question:"TRUE or FALSE: A fracture of the cribriform plate can lead to loss of smell.",options:["True","False"],answer:"A",explanation:"TRUE. The olfactory nerve (CN I) fibers pass through tiny foramina in the cribriform plate of the ethmoid bone. A fracture can sever these fibers → anosmia."},
+  {topic:"Olfactory System",question:"COVID-19 patients reported foods tasting metallic or less flavorful after recovery. This phenomenon is classified as:",options:["Anosmia","Myopia","Dysosmia","Dysgeusia"],answer:"D",explanation:"Dysgeusia = distorted or altered sense of taste. Anosmia = loss of smell. The COVID-related taste disturbances are dysgeusia (though anosmia also commonly occurs and affects flavor perception)."},
 
-            // Numbered questions at start of line: "1. ", "2. ", etc.
-            const qBlocks = section.split(/\n\s*\d+\.\s+/).slice(1);
+  // GUSTATORY SYSTEM
+  {topic:"Gustatory System",question:"Which cranial nerve carries taste from the anterior two-thirds of the tongue?",options:["CN IX (Glossopharyngeal)","CN VII (Facial)","CN X (Vagus)","CN V3 (Trigeminal)"],answer:"B",explanation:"CN VII (Facial) carries taste from the anterior 2/3 of the tongue via the chorda tympani branch. CN IX carries taste from the posterior 1/3."},
+  {topic:"Gustatory System",question:"The primary function of filiform papillae is:",options:["Detection of bitter taste at highest density","Detection of umami through mGluR4 receptors","Providing texture and friction for mechanical manipulation of food","Releasing lingual lipase to begin fat digestion"],answer:"C",explanation:"Filiform papillae are the ONLY papillae that contain NO taste buds. They are purely mechanical — providing texture/grip for food manipulation."},
+  {topic:"Gustatory System",question:"Which taste sensation is mediated by ion channels rather than GPCRs?",options:["Sweet and Bitter","Salty and Sour","Umami and Sweet","Bitter and Umami"],answer:"B",explanation:"Salty (Na+ enters ENaC channels) and Sour (H+ blocks K+ channels) use ion channels directly. Sweet, Bitter, and Umami use GPCRs (T1R and T2R families)."},
+  {topic:"Gustatory System",question:"Salty and sour tastes are detected by ion channels. Which ion movements are correct?",options:["Sour: Na+ influx; Salty: H+ blocks Ca2+ channels","Salty: H+ influx; Sour: Na+ blocks K+ channels","Salty: Na+ influx; Sour: H+ blocks K+ channels","Salty: Ca2+ influx; Sour: Cl- efflux"],answer:"C",explanation:"Salty: Na+ enters through amiloride-sensitive ENaC channels → depolarization. Sour: H+ (from acidic foods) blocks K+ leak channels → depolarization."},
+  {topic:"Gustatory System",question:"Which nucleus receives visceral sensory input (including taste) from CN VII, IX, and X?",options:["Nucleus ambiguus","Dorsal motor nucleus","Inferior olivary nucleus","Nucleus tractus solitarius (NTS)"],answer:"D",explanation:"The NTS (solitary nucleus) in the medulla is the primary brainstem relay for all visceral afferent input — taste, baroreceptor signals, chemoreceptors, and gut mechanoreceptors."},
 
-            qBlocks.forEach(block => {
-                // Split into question + choices A–D
-                const parts = block.split(/\n\s*[A-D]\.\s/);
-                if (parts.length < 2) return;
+  // AUDITORY SYSTEM
+  {topic:"Auditory & Vestibular",question:"The utricle detects ___, the saccule detects ___, and the semicircular canals detect ___.",options:["Angular; Vertical; Horizontal","Angular; Horizontal; Vertical","Vertical; Horizontal; Angular","Horizontal; Vertical; Angular"],answer:"D",explanation:"Utricle = horizontal linear acceleration (side to side). Saccule = vertical linear acceleration (up/down, gravity). Semicircular canals = angular/rotational acceleration."},
+  {topic:"Auditory & Vestibular",question:"Organ of Corti hair cell depolarization occurs when stereocilia deflect:",options:["Toward shortest cilium → K+ efflux","Toward tallest cilium → K+ influx from endolymph","Toward tallest cilium → Na+ influx from perilymph","Toward shortest cilium → Ca2+ influx from endolymph"],answer:"B",explanation:"Deflection toward the kinocilium (tallest stereocilium) opens tip-link-gated channels. K+ flows IN from the high-K+ endolymph (driven by the +80mV endocochlear potential) → depolarization."},
+  {topic:"Auditory & Vestibular",question:"Which part of the cochlea responds to high-frequency sounds?",options:["Base (near oval window)","Apex","Middle turn","Helicotrema"],answer:"A",explanation:"The basilar membrane is narrow and stiff at the base → resonates at HIGH frequencies. Wide and floppy at the apex → resonates at LOW frequencies. This tonotopic organization underlies frequency discrimination."},
+  {topic:"Auditory & Vestibular",question:"A musician develops selective loss of sensitivity above 8 kHz. Which cochlear region is damaged?",options:["Apex — wide, flexible membrane optimized for high frequencies","Base — narrow, stiff basilar membrane tuned for high frequencies","Middle turn — transmits frequencies near the helicotrema","Helicotrema — where pressure waves dissipate"],answer:"B",explanation:"High-frequency sensitivity depends on the basal region of the cochlea. Noise-induced hearing loss typically starts at 4–8 kHz because this region is most vulnerable to acoustic trauma."},
+  {topic:"Auditory & Vestibular",question:"A patient shows normal ABR at high intensities but markedly reduced sensitivity to soft sounds. Which structure is most likely impaired?",options:["Inner hair cells","Type II spiral ganglion neurons","Tectorial membrane","Outer hair cells"],answer:"D",explanation:"Outer hair cells (OHCs) amplify soft sounds via electromotility (prestin-driven length changes). Loss of OHCs → reduced gain → difficulty hearing quiet sounds, while loud sounds can still activate inner hair cells."},
+  {topic:"Auditory & Vestibular",question:"Stereocilia are immersed in high-K+ endolymph. Deflection toward tallest cilium opens tip-link channels. Which ionic event follows?",options:["K+ efflux → hyperpolarization","K+ influx driven by electrical and chemical gradients → graded depolarization","Ca2+ efflux reducing neurotransmitter release","Na+ influx through voltage-gated channels"],answer:"B",explanation:"K+ in endolymph (~150 mM) is at high concentration AND the endocochlear potential is +80 mV. Both concentration and electrical gradients drive K+ INTO the hair cell when tip-link channels open → depolarization."},
+  {topic:"Auditory & Vestibular",question:"Ménière's disease: A 32-year-old with episodic vertigo (5–8 min), nausea, tinnitus, and fluctuating hearing loss. Diagnosis?",options:["Otosclerosis","Benign Paroxysmal Positional Vertigo","Ménière's disease","Labyrinthitis"],answer:"C",explanation:"The classic triad of episodic vertigo + tinnitus + fluctuating sensorineural hearing loss = Ménière's disease. Caused by endolymphatic hydrops (excess endolymph accumulation distending the membranous labyrinth)."},
+  {topic:"Auditory & Vestibular",question:"In the auditory pathway, where does the FIRST binaural processing occur?",options:["Cochlear nucleus","Superior olivary complex","Inferior colliculus","Medial geniculate nucleus"],answer:"B",explanation:"The superior olivary complex (SOC) in the pons is the first site where inputs from BOTH ears converge. This is critical for sound localization (ITD and ILD processing)."},
+  {topic:"Auditory & Vestibular",question:"TRUE or FALSE: Endolymph and perilymph have identical ion compositions.",options:["True","False"],answer:"B",explanation:"FALSE. Endolymph (in scala media) is HIGH in K+, LOW in Na+ — unique for an extracellular fluid. Perilymph (scala vestibuli/tympani) is HIGH in Na+, LOW in K+ — similar to CSF."},
 
-                const questionText = parts[0].trim();
-                if (!questionText) return;
+  // SPINAL CORD TRACTS
+  {topic:"Spinal Cord Tracts",question:"A patient suffers complete right hemisection at T4 (Brown-Séquard). Expected deficits below T4?",options:["Loss of all sensation bilaterally; preserved motor","Loss of pain/temp on left; loss of fine touch/proprioception and motor on right","Loss of pain/temp on right; loss of fine touch/proprioception and motor on left","Loss of all sensation and motor on the left"],answer:"B",explanation:"In Brown-Séquard: Motor (corticospinal) and DCML fibers cross in the MEDULLA → ipsilateral motor and fine touch loss (right). Spinothalamic fibers cross in the SPINAL CORD → contralateral pain/temp loss (left)."},
+  {topic:"Spinal Cord Tracts",question:"Syringomyelia presents with bilateral loss of pain and temperature in a 'cape-like' distribution. Why?",options:["Dorsal columns are most resistant to compression","Fine touch fibers are myelinated and immune to central cavitation","The crossing spinothalamic fibers at the anterior commissure are disrupted first","The syrinx forms posteriorly, sparing anterior spinothalamic fibers"],answer:"C",explanation:"A syrinx (central fluid cavity) damages the crossing spinothalamic fibers at the anterior white commissure FIRST. Dorsal column fibers (ipsilateral) are spared → fine touch preserved. Pain/temp lost bilaterally at affected segments."},
+  {topic:"Spinal Cord Tracts",question:"The DCML pathway decussates at which location?",options:["Spinal cord at level of entry","Midbrain","Medulla (nucleus gracilis and cuneatus)","Thalamus"],answer:"C",explanation:"DCML fibers ascend IPSILATERALLY in the dorsal columns all the way to the medulla, where they synapse in nucleus gracilis (lower body) and nucleus cuneatus (upper body), then cross as the medial lemniscus."},
+  {topic:"Spinal Cord Tracts",question:"The spinothalamic tract decussates at which location?",options:["Spinal cord, within 1–2 segments of entry","Medulla","Pons","Midbrain"],answer:"A",explanation:"Spinothalamic fibers synapse in the dorsal horn, cross through the anterior white commissure within 1–2 segments, and ascend CONTRALATERALLY. This explains why spinal cord lesions cause contralateral pain/temp loss."},
+  {topic:"Spinal Cord Tracts",question:"Upper motor neuron (UMN) lesions produce:",options:["Flaccid paralysis, muscle atrophy, fasciculations, absent reflexes","Spastic paralysis, hyperreflexia, Babinski sign, minimal atrophy","Flaccid paralysis, hyperreflexia, intact sensation","Spastic paralysis, absent reflexes, sensory loss"],answer:"B",explanation:"UMN lesions (stroke, MS, spinal cord injury above the LMN) remove descending inhibition → spasticity and hyperreflexia. Babinski sign (plantar dorsiflexion) indicates UMN lesion. Minimal atrophy because LMN intact."},
+  {topic:"Spinal Cord Tracts",question:"Which spinal tract carries unconscious proprioception from lower limbs to cerebellum WITHOUT decussating?",options:["Ventral spinocerebellar","Dorsal spinocerebellar","Spinothalamic","Dorsal column"],answer:"B",explanation:"The dorsal spinocerebellar tract carries unconscious proprioception from lower limbs to the ipsilateral cerebellum WITHOUT crossing. The ventral spinocerebellar decussates twice (net ipsilateral)."},
+  {topic:"Spinal Cord Tracts",question:"Which ascending spinal tract carries fine touch, vibration, and conscious proprioception?",options:["Spinothalamic tract","Dorsal column–medial lemniscal pathway","Ventral spinocerebellar tract","Rubrospinal tract"],answer:"B",explanation:"The DCML pathway carries fine touch, 2-point discrimination, vibration, and conscious proprioception. It crosses in the medulla. The spinothalamic tract carries pain and temperature."},
+  {topic:"Spinal Cord Tracts",question:"After synapsing in the medulla, DCML fibers ascend to which thalamic nucleus?",options:["Lateral geniculate nucleus","Medial geniculate nucleus","Ventral posterior lateral (VPL) nucleus","Pulvinar nucleus"],answer:"C",explanation:"The medial lemniscus (from crossed DCML fibers) terminates in the VPL nucleus of the thalamus. From VPL, signals project to the primary somatosensory cortex (S1) in the postcentral gyrus."},
+  {topic:"Spinal Cord Tracts",question:"A patient with tabes dorsalis (syphilitic dorsal column degeneration) would have difficulty with:",options:["Feeling pain from a pin prick","Detecting vibration and knowing limb position without looking","Moving limbs voluntarily","Feeling heat from a warm object"],answer:"B",explanation:"Tabes dorsalis destroys the dorsal columns → loss of vibration sense and proprioception (positive Romberg, wide-based gait, Charcot joints). Pain sensation (spinothalamic) is preserved."},
 
-                const ansMatch = block.match(/Answer:\s*([A-D])/i);
-                if (!ansMatch) return; // skip non-MCQ blocks
+  // PROPRIOCEPTION
+  {topic:"Proprioception",question:"Muscle spindles detect ___, while Golgi tendon organs detect ___.",options:["Tension; Length","Length/Stretch; Tension/Force","Vibration; Pressure","Heat; Pain"],answer:"B",explanation:"Muscle spindles (in PARALLEL with extrafusal fibers) detect muscle LENGTH/STRETCH. GTOs (in SERIES at musculotendinous junction) detect muscle TENSION/FORCE."},
+  {topic:"Proprioception",question:"During the stretch reflex, inhibition of the antagonist occurs via:",options:["Direct inhibition by the Ia afferent fiber","Recurrent inhibition through Renshaw cells","Reciprocal inhibition via inhibitory interneurons","Golgi tendon organ activation"],answer:"C",explanation:"The Ia afferent from the muscle spindle excites the agonist's alpha motor neuron AND activates an inhibitory interneuron that inhibits the antagonist's alpha motor neuron — reciprocal inhibition."},
+  {topic:"Proprioception",question:"The patellar tendon reflex uses which afferent fiber?",options:["Aδ fibers","C fibers","Ib fibers","Ia fibers"],answer:"D",explanation:"Ia fibers (fastest conducting sensory fibers, Group A-alpha) carry signals from the primary endings of muscle spindles (nuclear bag fibers). They make direct monosynaptic connections with alpha motor neurons."},
+  {topic:"Proprioception",question:"Gamma motor neurons innervate intrafusal fibers. Their role is to:",options:["Directly contract the muscle to produce movement","Adjust spindle sensitivity during muscle contraction","Inhibit the Golgi tendon organ signal","Relay proprioceptive information to the cerebellum"],answer:"B",explanation:"Alpha motor neurons contract extrafusal fibers (actual movement). Gamma motor neurons contract intrafusal fibers to maintain spindle tension during shortening — keeping the spindle sensitive (alpha-gamma coactivation)."},
+  {topic:"Proprioception",question:"A patient has hyperactive deep tendon reflexes (hyperreflexia). Most consistent with:",options:["Lower motor neuron lesion — loss of the reflex arc","Upper motor neuron lesion — loss of descending inhibition on reflex arc","Golgi tendon organ lesion — loss of autogenic inhibition","Muscle spindle degeneration — loss of stretch sensing"],answer:"B",explanation:"UMN lesions remove the descending inhibitory tone on spinal interneurons and motor neurons → unopposed reflex activity → hyperreflexia. LMN lesions reduce or abolish reflexes."},
+  {topic:"Proprioception",question:"Neurons in S1 are arranged somatotopically, with largest cortical representation for:",options:["Upper back","Forearm","Calf","Fingertips"],answer:"D",explanation:"The cortical homunculus shows disproportionately large representation for areas requiring fine tactile discrimination — hands (especially fingertips), face, lips, and tongue."},
 
-                const explMatch = block.match(
-                    /Explanation:\s*([\s\S]*?)(?=\n\s*\d+\.\s+|^##\s+|$)/mi
-                );
+  // CRANIAL NERVES
+  {topic:"Cranial Nerves",question:"Which cranial nerve aids in digestion, blood pressure regulation, and autonomic visceral functions?",options:["CN III","CN VIII","CN X (Vagus)","CN XII"],answer:"C",explanation:"The Vagus nerve (CN X) is the great parasympathetic wanderer — innervating the heart, lungs, esophagus, stomach, intestines to the splenic flexure. It also carries baroreceptor and chemoreceptor afferents."},
+  {topic:"Cranial Nerves",question:"The corneal reflex (touching eyelid → blink). Which CN carries the sensory signal?",options:["CN VII","CN IX","CN III","CN V"],answer:"D",explanation:"Afferent = CN V1 (ophthalmic branch of trigeminal). Efferent = CN VII (facial nerve). The reflex arc: touch → CN V → trigeminal nucleus → CN VII nucleus → orbicularis oculi contracts."},
+  {topic:"Cranial Nerves",question:"What are the afferent and efferent fibers of the pupillary light reflex?",options:["Afferent CN III; Efferent CN II","Afferent CN II; Efferent CN III via Edinger-Westphal","Afferent CN V; Efferent CN VII","Afferent CN VIII; Efferent CN VI"],answer:"B",explanation:"Afferent: CN II (optic nerve) → pretectal nucleus. Efferent: CN III (oculomotor) via Edinger-Westphal nucleus → ciliary ganglion → sphincter pupillae → pupillary constriction."},
+  {topic:"Cranial Nerves",question:"The Edinger-Westphal nucleus is a visceral nucleus of CN III. A lesion causes:",options:["Ipsilateral ptosis and downward gaze","Fixed, dilated (mydriatic) pupil — loss of pupillary constriction","Loss of lateral gaze","Facial muscle paralysis"],answer:"B",explanation:"EW nucleus provides parasympathetic input to the sphincter pupillae. A lesion = loss of pupillary constriction → fixed, dilated pupil (mydriasis). This is the first sign of uncal herniation compressing CN III."},
+  {topic:"Cranial Nerves",question:"Select the correct pairings of lesions and effects (select all that apply): a) Substantia nigra–rigidity, b) Hippocampus–inability to form new memories, c) Putamen–chorea, d) Cerebellum–loss of fine motor coordination, e) Primary motor cortex–contralateral sensory loss, f) Subthalamus–hemiballismus, g) Wernicke's–non-fluent speech, h) Medulla–loss of voluntary movement",options:["a, b, c, d, f","a, b, d, f, g","b, c, e, f, h","a, c, d, e, g"],answer:"A",explanation:"Correct: a) SN→rigidity (dopamine loss), b) Hippocampus→anterograde amnesia, c) Putamen lesion→chorea, d) Cerebellum→ataxia, f) Subthalamus→hemiballismus. Wrong: e) Motor cortex→motor (not sensory) loss; g) Wernicke's→fluent but nonsensical (Broca's = non-fluent); h) Medulla→autonomic not voluntary movement."},
+  {topic:"Cranial Nerves",question:"A cortical region in the superior temporal lobe maps speech sounds to lexical/semantic representations. Damage causes:",options:["Nonfluent, effortful speech with preserved comprehension","Intact comprehension but impaired repetition","Inability to attach semantic meaning to heard words (Wernicke's/receptive aphasia)","Difficulty articulating speech due to motor control impairment"],answer:"C",explanation:"Wernicke's area (posterior superior temporal gyrus, usually left) = language comprehension. Damage → fluent but meaningless speech (word salad), poor comprehension, impaired repetition — Wernicke's/receptive aphasia."},
+  {topic:"Cranial Nerves",question:"A reflex pull from a nail vs. consciously deciding to look — which is faster and why?",options:["Voluntary movement; cortical processing is faster","Both are equally fast","Reflex; it travels only to spinal cord via polysynaptic reflex arc, bypassing cortex","Reflex; it uses myelinated fibers exclusively"],answer:"C",explanation:"The spinal withdrawal reflex bypasses the brain entirely — sensory → spinal cord interneurons → motor neurons. The voluntary action requires full cortical processing: sensory ascent → cortical processing → motor descent — much slower."},
 
-                const options = [];
-                for (let i = 1; i < parts.length && i <= 4; i++) {
-                    const raw = parts[i]
-                        .split(/\n(Answer|Explanation):/i)[0]
-                        .trim();
-                    if (raw) options.push(raw);
-                }
-                if (options.length < 2) return;
+  // ENDOCRINE — MECHANISMS
+  {topic:"Endocrine Mechanisms",question:"Which hormone acts on nuclear receptors?",options:["Insulin","PTH","Cortisol","TSH"],answer:"C",explanation:"Cortisol is a steroid hormone (lipid-soluble). It diffuses through the plasma membrane and binds intracellular (cytoplasmic/nuclear) receptors → hormone-receptor complex binds DNA → alters gene transcription."},
+  {topic:"Endocrine Mechanisms",question:"Which endocrine organ stores hormone-containing colloid extracellularly?",options:["Adrenal cortex","Thyroid gland","Pancreas","Pituitary gland"],answer:"B",explanation:"The thyroid gland is unique — it stores large amounts of thyroglobulin (precursor to T3/T4) in extracellular follicular colloid. No other endocrine gland stores hormones extracellularly in this way."},
+  {topic:"Endocrine Mechanisms",question:"Which hormone pair demonstrates that chemical class does NOT always predict receptor location?",options:["Cortisol/Aldosterone","Growth Hormone/Prolactin","Thyroxine/Epinephrine","Insulin/Glucagon"],answer:"C",explanation:"Both T4 (thyroxine) and epinephrine are amines. BUT T4 is lipid-soluble → acts on NUCLEAR receptors. Epinephrine is water-soluble → acts on MEMBRANE GPCRs. Same class, different receptor locations."},
+  {topic:"Endocrine Mechanisms",question:"How do T4 and T3 differ?",options:["T3 has shorter half-life than T4","T4 has stronger metabolic effects than T3","Blood concentration of T4 is far higher than T3","A and C"],answer:"D",explanation:"T3 is the active form (3–4x more potent than T4) and has a SHORTER half-life (~1 day vs ~7 days for T4). T4 is the predominant circulating form (~50x higher concentration than T3). T4 is converted to T3 in peripheral tissues."},
+  {topic:"Endocrine Mechanisms",question:"Posterior vs anterior pituitary — which is correct?",options:["Posterior pituitary produces and secretes GH and prolactin","Posterior pituitary produces oxytocin and ADH; anterior stores and releases them","Anterior pituitary produces and secretes GH, prolactin; posterior STORES and releases oxytocin and ADH","Anterior produces oxytocin and ADH; posterior stores and releases GH and prolactin"],answer:"C",explanation:"Anterior pituitary (adenohypophysis) SYNTHESIZES AND SECRETES: GH, TSH, ACTH, FSH, LH, Prolactin, MSH. Posterior pituitary (neurohypophysis) STORES AND RELEASES oxytocin and ADH (synthesized by hypothalamic nuclei)."},
+  {topic:"Endocrine Mechanisms",question:"Hormone X binds cytoplasmic receptors and changes transcription. Hormone Y activates a GPCR and cAMP. Classification?",options:["X=Peptide; Y=Steroid","X=Steroid; Y=Peptide","X=Amine; Y=Steroid","X=Steroid; Y=Amine"],answer:"B",explanation:"Binding intracellular receptors and altering transcription = steroid mechanism. Activating GPCR → cAMP second messenger = peptide/amine membrane receptor mechanism."},
+  {topic:"Endocrine Mechanisms",question:"Which best describes the cAMP second messenger cascade?",options:["Hormone binds membrane receptor → receptor directly phosphorylates targets → gene expression changes","Hormone binds GPCR → Gs activated → adenylyl cyclase → ATP→cAMP → PKA → phosphorylates target enzymes; cAMP degraded by phosphodiesterase","Hormone binds GPCR → Gq → PLC → IP3+DAG → Ca2+ release → cAMP","Hormone binds nuclear receptor → activates adenylyl cyclase → cAMP → PKA"],answer:"B",explanation:"The cAMP cascade: hormone binds GPCR → Gs subunit activates adenylyl cyclase → ATP→cAMP → activates protein kinase A (PKA) → phosphorylates targets (enzymes, transcription factors) → cellular response. Terminated by phosphodiesterase."},
 
-                allQuestions.push({
-                    topic,
-                    question: questionText,
-                    options,
-                    answer: ansMatch[1].toUpperCase(),
-                    explanation: explMatch ? explMatch[1].trim() : "Correct answer confirmed."
-                });
-            });
-        });
-    }
+  // ENDOCRINE — HPA AXIS
+  {topic:"HPA Axis & Stress",question:"Correct sequence of the HPA axis stress response:",options:["ACTH→CRH→cortisol","CRH→ACTH→cortisol","Cortisol→CRH→ACTH","ACTH→cortisol→CRH"],answer:"B",explanation:"Stress → hypothalamus releases CRH → via hypophyseal portal to anterior pituitary → ACTH secreted → adrenal cortex (zona fasciculata) → cortisol released. Cortisol feeds back negatively to hypothalamus and anterior pituitary."},
+  {topic:"HPA Axis & Stress",question:"A patient on long-term corticosteroid therapy abruptly stops. Primary danger?",options:["Cushing's syndrome from rebound hypersecretion","Adrenal insufficiency crisis — atrophied adrenal glands cannot produce sufficient cortisol","Graves' disease from thyroid overstimulation","Hypoaldosteronism only"],answer:"B",explanation:"Chronic exogenous corticosteroids suppress ACTH via negative feedback → adrenal cortex atrophies from disuse. Abrupt cessation → no cortisol production → adrenal crisis (hypotension, hypoglycemia, vomiting, hyponatremia). Must taper slowly."},
+  {topic:"HPA Axis & Stress",question:"Why do Addison's disease patients develop hyperpigmentation?",options:["Low cortisol directly stimulates melanocytes","Low cortisol removes negative feedback → very high ACTH; ACTH shares POMC precursor with α-MSH → stimulates melanocytes","Aldosterone deficiency causes skin pigment deposition","Adrenal androgens cause hyperpigmentation when absent"],answer:"B",explanation:"In Addison's, low cortisol removes feedback inhibition → ACTH skyrockets. ACTH and α-MSH are both cleaved from POMC (proopiomelanocortin). Excess ACTH cross-reacts with MC1R on melanocytes → increased melanin → hyperpigmentation (especially skin creases, buccal mucosa, scars)."},
+  {topic:"HPA Axis & Stress",question:"Patient: low cortisol, high ACTH, hyponatremia, hyperkalemia, hypoglycemia, hypotension. Diagnosis?",options:["Cushing's disease","Primary adrenal insufficiency (Addison's disease)","SIADH","Pheochromocytoma"],answer:"B",explanation:"This is classic Addison's (primary adrenal insufficiency): low cortisol, HIGH ACTH (no negative feedback), hyponatremia (aldosterone deficiency → Na+ wasting), hyperkalemia, hypoglycemia (no cortisol-mediated gluconeogenesis), hypotension."},
+  {topic:"HPA Axis & Stress",question:"Which physiological abnormality is associated with Cushing's Syndrome regarding glucocorticoid secretion?",options:["Stress decreases plasma cortisol in Cushing's","The negative feedback loop is defective — cortisol cannot suppress CRH and ACTH","Cortisol is higher in the evening than morning (opposite of normal)","Cortisol levels fluctuate greatly throughout the day"],answer:"B",explanation:"In Cushing's syndrome, the cortisol source (pituitary adenoma, adrenal tumor, or ectopic ACTH) is autonomous — it doesn't respond to cortisol's negative feedback. CRH and ACTH remain elevated despite high cortisol."},
 
-    function renderChips() {
-        const topics = [...new Set(allQuestions.map(q => q.topic))];
-        const container = document.getElementById('topic-chips');
-        container.innerHTML = '';
-        topics.slice(0, 15).forEach(t => {
-            const chip = document.createElement('div');
-            chip.className = 'chip';
-            chip.innerText = t;
-            chip.onclick = () => {
-                document.getElementById('ai-input').value = `10 questions on ${t}`;
-                startQuiz();
-            };
-            container.appendChild(chip);
-        });
-    }
+  // ENDOCRINE — RAAS
+  {topic:"RAAS & Aldosterone",question:"Which cells secrete renin and what stimulates them?",options:["Macula densa; high blood pressure","Juxtaglomerular (JG) cells; low blood pressure","Podocytes; high protein levels","Mesangial cells; high glucose"],answer:"B",explanation:"JG cells (modified smooth muscle of the afferent arteriole) act as renal baroreceptors. They release renin in response to: low BP (stretch receptor), low Na+ delivery to macula densa, and sympathetic stimulation (β1 receptors)."},
+  {topic:"RAAS & Aldosterone",question:"What is the effect of ADH on the collecting duct?",options:["It increases Na+ reabsorption via ENaC","It inserts aquaporin-2 channels to increase water reabsorption","It inhibits the Na+/K+ pump","It causes vasoconstriction of the afferent arteriole"],answer:"B",explanation:"ADH (Vasopressin) binds V2 receptors on collecting duct cells → cAMP → PKA → insertion of aquaporin-2 (AQP2) channels into apical membrane → water moves from urine back into blood → concentrated urine."},
+  {topic:"RAAS & Aldosterone",question:"Primary hyperaldosteronism (Conn's syndrome) expected lab findings:",options:["High renin, high aldosterone, hyperkalemia","Low renin, high aldosterone, hypokalemia, metabolic alkalosis","High renin, low aldosterone, hyperkalemia","Low renin, low aldosterone, hyponatremia"],answer:"B",explanation:"Conn's: autonomous aldosterone hypersecretion → Na+/water retention (↑BP) → K+ wasting (hypokalemia) → metabolic alkalosis (H+ secreted with K+) → volume expansion SUPPRESSES renin (low PRA distinguishes primary from secondary)."},
+  {topic:"RAAS & Aldosterone",question:"Low level of which hormone would most directly cause low blood pressure and high serum potassium?",options:["Cortisol","Epinephrine","Aldosterone","Thyroxine"],answer:"C",explanation:"Aldosterone promotes Na+ reabsorption and K+ excretion in the collecting duct. Without it: Na+ wasting → volume depletion → hypotension; K+ retention → hyperkalemia. Classic Addison's finding when both cortex zones are destroyed."},
 
-    function startQuiz() {
-        const input = document.getElementById('ai-input').value.toLowerCase();
-        const numMatch = input.match(/\d+/);
-        const num = numMatch ? parseInt(numMatch[0], 10) : 10;
+  // ENDOCRINE — THYROID & PARATHYROID
+  {topic:"Thyroid & Parathyroid",question:"A patient has low cortisol, high ACTH, salt craving, and hyperpigmentation. Diagnosis?",options:["Cushing's Syndrome","Addison's Disease","Conn's Syndrome","Diabetes Insipidus"],answer:"B",explanation:"Primary adrenal insufficiency (Addison's). Low cortisol → loss of negative feedback → high ACTH. High ACTH → α-MSH → hyperpigmentation. Salt craving = aldosterone deficiency → Na+ wasting."},
+  {topic:"Thyroid & Parathyroid",question:"A patient with heat intolerance, tachycardia, weight loss, low TSH, high T3/T4, positive TSH-receptor antibodies. Mechanism?",options:["Excess pituitary TSH secretion","Autoantibody activation of TSH receptor increases thyroid hormone production and suppresses TSH via negative feedback","Release of preformed thyroid hormone due to gland destruction","Peripheral conversion of T4 to T3 increases TSH"],answer:"B",explanation:"Graves' disease: TSI (thyroid-stimulating immunoglobulins) mimic TSH → constitutive activation of thyroid follicular cells → excess T3/T4 → negative feedback suppresses pituitary TSH → low TSH despite high thyroid hormones."},
+  {topic:"Thyroid & Parathyroid",question:"Which symptom distinguishes Hashimoto's thyroiditis from simple iodine deficiency?",options:["Goiter","Cold intolerance","Fatigue","Puffy skin","Circulating autoantibodies (anti-TPO, anti-Tg)"],answer:"E",explanation:"Both can cause goiter and hypothyroid symptoms. The distinguishing feature of Hashimoto's is the presence of circulating anti-TPO and anti-thyroglobulin antibodies — confirming autoimmune etiology."},
+  {topic:"Thyroid & Parathyroid",question:"Which finding distinguishes central from nephrogenic diabetes insipidus?",options:["High plasma osmolarity","Low urine osmolarity","Low circulating ADH levels","Excessive water loss through sweat glands"],answer:"C",explanation:"Central DI = ADH DEFICIENCY (hypothalamus/posterior pituitary damage). Nephrogenic DI = ADH is PRESENT but kidneys don't respond (V2 receptor or AQP2 defect). Both cause dilute polyuria, but ADH levels differentiate them."},
+  {topic:"Thyroid & Parathyroid",question:"A patient with low serum calcium has elevated PTH. Most consistent PTH effects?",options:["Decreased Ca2+ reabsorption in kidney and decreased calcitriol","Increased Ca2+ reabsorption in kidney and increased osteoblast activity","Increased Ca2+ reabsorption in kidney, increased osteoclast activity, and increased calcitriol production","Increased osteoclast activity but decreased intestinal Ca2+ absorption"],answer:"C",explanation:"PTH actions: 1) Kidney: increases Ca2+ reabsorption, decreases PO4 reabsorption, activates 1α-hydroxylase (calcitriol). 2) Bone: activates osteoclasts (via RANKL from osteoblasts) → bone resorption. 3) Intestine: indirectly via calcitriol → increased Ca2+ absorption."},
+  {topic:"Thyroid & Parathyroid",question:"In congenital iodine deficiency, severe neurodevelopmental delay occurs. Best mechanism?",options:["Decreased thyroid hormone reduces neuronal protein synthesis and myelination","Lack of thyroid hormone increases calcitonin, disrupting neuronal metabolism","Excess TSH overstimulates thyroid → toxic T4 levels","Low iodine damages neuronal mitochondria directly"],answer:"A",explanation:"Thyroid hormone (T3) is critical for fetal and neonatal brain development — it drives neuronal proliferation, differentiation, migration, myelination, and synaptogenesis. Deficiency (cretinism) → irreversible intellectual disability."},
 
-        let pool = allQuestions.filter(q =>
-            input.includes(q.topic.toLowerCase()) ||
-            input.includes('everything') ||
-            input.includes('all')
-        );
-        if (pool.length === 0) pool = allQuestions;
+  // ENDOCRINE — DISORDERS (CASE STUDIES)
+  {topic:"Endocrine Disorders",question:"Patient: T3=245 ng/dL (high), T4=15 μg/dL (high), TSH=0.1 μU/mL (low), anti-TSH receptor antibodies positive. Diagnosis?",options:["Hashimoto's thyroiditis","Graves' disease","Toxic multinodular goiter","Secondary hyperthyroidism"],answer:"B",explanation:"Graves' disease = autoimmune hyperthyroidism with positive TSI/anti-TSH receptor antibodies. High T3/T4, suppressed TSH (autonomous stimulation bypasses pituitary feedback), positive antibodies. Distinguished from Hashimoto's by hyperthyroid state and antibody type."},
+  {topic:"Endocrine Disorders",question:"Patient: serum Na+=149, K+=2.8, BP=162/98, plasma renin=0.2 (low), aldosterone=44 (high). Diagnosis?",options:["Addison's disease","Primary hyperaldosteronism (Conn's syndrome)","Secondary hyperaldosteronism","Cushing's syndrome"],answer:"B",explanation:"Conn's syndrome: autonomous aldosterone excess (often from adrenal adenoma) → Na+ retention (hypernatremia, HTN) → K+ wasting (hypokalemia) → suppressed renin (volume expansion). KEY: low renin + high aldosterone = primary (not secondary) hyperaldosteronism."},
+  {topic:"Endocrine Disorders",question:"Patient: blood glucose=290, insulin=2 (low), glucagon=160 (high), urine glucose+, serum ketones+. Diagnosis?",options:["Type 2 Diabetes","Type 1 Diabetes Mellitus","MODY (Maturity-onset diabetes of the young)","Cushing's syndrome"],answer:"B",explanation:"Type 1 DM: autoimmune β-cell destruction → absent insulin → hyperglycemia (cells can't take up glucose) → glucosuria (exceeds renal threshold) → DKA (unopposed glucagon → lipolysis → ketones → fruity breath, pH ↓)."},
+  {topic:"Endocrine Disorders",question:"A 59-year-old obese smoker with facial flushing, purple abdominal striae, and buffalo hump. Diagnosis?",options:["Addison's disease","Hypothyroidism","Cushing's syndrome (likely ectopic ACTH from small cell lung cancer)","Primary hyperaldosteronism"],answer:"C",explanation:"Cushing's syndrome = excess cortisol. Signs: central obesity, buffalo hump, purple striae (skin fragility), moon face, facial flushing. 30 pack-year smoking history → suspect ectopic ACTH from small cell lung cancer as the cortisol source."},
+  {topic:"Endocrine Disorders",question:"A patient with zona glomerulosa destruction only presents with hyperkalemia and hyponatremia, but normal cortisol. Why?",options:["Impaired cortisol-mediated sodium retention","Excess ACTH production","Loss of aldosterone-sensitive Na+/K+ exchange in distal nephron","Compensatory adrenal androgen overproduction"],answer:"C",explanation:"Zona glomerulosa produces ALDOSTERONE only. Aldosterone controls Na+/K+ exchange via ENaC in the collecting duct. Loss → Na+ wasting (hyponatremia) and K+ retention (hyperkalemia). Cortisol (zona fasciculata) and androgens (zona reticularis) are unaffected."},
+  {topic:"Endocrine Disorders",question:"Addison's progression: most accurate and thorough explanation for subclinical → acute crisis pattern?",options:["Autoimmune destruction slowly depletes adrenal cortex; symptoms remain subclinical until physiological stressor increases cortisol demand beyond reserve capacity","The flu virus directly destroys adrenal tissue","Addison's is caused by a virus with long latency","The PCP misdiagnosed; the patient was already experiencing Addison's all along"],answer:"A",explanation:"Autoimmune adrenalitis slowly destroys the adrenal cortex over months-years. Subclinical reserve is maintained until >90% cortex is destroyed OR a physiological stressor (infection, surgery) spikes cortisol demand — triggering acute adrenal crisis."},
 
-        currentQuiz = pool.sort(() => 0.5 - Math.random()).slice(0, num);
-        currentIdx = 0;
-        userAnswers = new Array(currentQuiz.length);
-        document.getElementById('setup-screen').classList.add('hidden');
-        document.getElementById('quiz-screen').classList.remove('hidden');
-        renderQuestion();
-    }
+  // ALS / MS / NEUROLOGICAL DISORDERS
+  {topic:"Neurological Disorders",question:"A 50-year-old with fine hand difficulty, arm twitching, ankle weakness, tripping, emotional changes. No bladder or sensory issues. Diagnosis?",options:["Multiple Sclerosis","ALS (Amyotrophic Lateral Sclerosis)","Parkinson's Disease","Myasthenia Gravis"],answer:"B",explanation:"ALS = combined UMN + LMN degeneration. UMN signs: spasticity, hyperreflexia, emotional lability. LMN signs: fasciculations, muscle atrophy, weakness. KEY: sensory and bladder function are PRESERVED in ALS — distinguishing it from MS and other disorders."},
+  {topic:"Neurological Disorders",question:"ALS with tongue fasciculations (LMN), left forearm atrophy (LMN), right leg hypertonia (UMN), positive Babinski (UMN), slow speech. The Babinski sign indicates:",options:["LMN lesion with preserved reflexes","UMN lesion — loss of descending inhibition on reflex arc causes dorsiflexion of big toe","LMN lesion — fasciculations in the plantar reflex arc","Normal finding in adults"],answer:"B",explanation:"Babinski sign: plantar stimulation → extension/dorsiflexion of big toe + fanning of other toes. This is ABNORMAL in adults and indicates UMN lesion (loss of corticospinal inhibition on the spinal reflex arc). Normal adults show plantar flexion."},
+  {topic:"Neurological Disorders",question:"Manasvi, 21, moved from Norway (low sunlight) to California. Develops dizziness, vertigo, coordination problems, blurry vision, then partial vision loss. Type of MS?",options:["Primary progressive MS","Secondary progressive MS","Relapsing-remitting MS (RRMS)","Progressive-relapsing MS"],answer:"C",explanation:"RRMS = distinct relapses (attacks) with recovery between episodes. She had acute neurological symptoms (relapse) that then partially resolved. RRMS is the most common form (~85% of MS cases at diagnosis). Risk factors: female sex, northern latitude (low vitamin D), genetic susceptibility."},
+  {topic:"Neurological Disorders",question:"Why does Manasvi have so many visual symptoms in MS?",options:["The macula is hypersensitive to autoimmune attack","The optic nerve is a common early target of demyelination (optic neuritis); MLF lesions cause internuclear ophthalmoplegia","MS preferentially affects cranial nerve nuclei","Low vitamin D directly damages the retina"],answer:"B",explanation:"The optic nerve (actually a CNS tract, not a peripheral nerve) is a very common early MS target → optic neuritis (blurry/painful vision, reduced color). The medial longitudinal fasciculus (MLF) is also frequently demyelinated → internuclear ophthalmoplegia (adduction failure with nystagmus of the abducting eye)."},
+  {topic:"Neurological Disorders",question:"Annalisa, 7, had two episodes of sudden loss of consciousness, generalized stiffening, twitching, shaking (1–2 min), followed by confusion and fatigue. EEG shows bilateral activity. Type of seizure?",options:["Absence seizure","Focal onset seizure","Generalized tonic-clonic seizure (grand mal)","Complex partial seizure"],answer:"C",explanation:"Generalized tonic-clonic (GTC) seizure = bilateral onset, consciousness lost, tonic phase (stiffening) followed by clonic phase (rhythmic jerking). Postictal confusion and fatigue are characteristic. EEG shows bilateral spike-and-wave discharges."},
 
-    function renderQuestion() {
-        const q = currentQuiz[currentIdx];
-        const progress = (currentIdx / currentQuiz.length) * 100;
-        document.getElementById('progress-fill').style.width = `${progress}%`;
-        document.getElementById('q-header').innerText =
-            `STEP ${currentIdx + 1} OF ${currentQuiz.length} • ${q.topic.toUpperCase()}`;
-        document.getElementById('q-text').innerText = q.question;
+  // PCOS
+  {topic:"Endocrine Disorders",question:"A 17-year-old with irregular periods, acne, coarse facial hair, weight gain, and family history of fertility problems. LH:FSH=4:1, elevated testosterone, low SHBG, elevated insulin. Diagnosis?",options:["Cushing's syndrome","Primary ovarian insufficiency","Polycystic Ovary Syndrome (PCOS)","Congenital adrenal hyperplasia"],answer:"C",explanation:"PCOS: elevated LH:FSH (>2:1) → theca cell androgen overproduction → anovulation, hirsutism, acne; insulin resistance → hyperinsulinemia → suppresses SHBG → more free testosterone; metabolic consequences (dyslipidemia, pre-diabetes)."},
 
-        const container = document.getElementById('options-container');
-        container.innerHTML = '';
-        document.getElementById('next-btn').classList.add('hidden');
+  // SPECIAL SENSES — HEARING DISORDERS
+  {topic:"Hearing Disorders",question:"A 32-year-old with episodic vertigo (5–8 min), nausea, tinnitus, fluctuating left ear hearing loss. Mechanism?",options:["Stapes fixation — conductive hearing loss","Endolymphatic hydrops — excess endolymph distends membranous labyrinth disrupting cochlear and vestibular hair cells","Autoimmune attack on cochlear hair cells","Bacterial infection of the middle ear"],answer:"B",explanation:"Ménière's disease = endolymphatic hydrops. Excess endolymph accumulation → mechanical distension of the membranous labyrinth → disrupts cochlear hair cells (hearing loss, tinnitus) and vestibular hair cells (episodic vertigo)."},
+  {topic:"Hearing Disorders",question:"Otosclerosis: Weber test lateralizes to the left ear. What does this indicate?",options:["Sensorineural hearing loss in the left ear","Conductive hearing loss in the left ear (stapes fixation)","Sensorineural hearing loss in the right ear","Normal hearing bilaterally"],answer:"B",explanation:"Weber test: vibrating fork placed on forehead. In CONDUCTIVE hearing loss, sound lateralizes to the AFFECTED (diseased) ear — because ambient masking noise is excluded by the blockage, making the affected ear relatively 'quieter' and thus perceiving bone-conducted sound better."},
+  {topic:"Hearing Disorders",question:"A 10-year-old with poor speech discrimination (8% left, 28% right), normal OAE, abnormal ABR, normal Rinne/Weber. Diagnosis?",options:["Conductive hearing loss from otitis media","Sensorineural loss from noise exposure","Auditory Neuropathy Spectrum Disorder (ANSD)","Ménière's disease"],answer:"C",explanation:"ANSD = outer hair cells intact (normal OAE) but neural synchrony disrupted (abnormal ABR = auditory nerve/brainstem dysfunction). Result: sounds detected but not decoded accurately, especially speech in noise. Normal Rinne/Weber confirms no conductive component."},
 
-        const letters = ['A', 'B', 'C', 'D'];
-        q.options.forEach((opt, i) => {
-            const letter = letters[i];
-            const div = document.createElement('div');
-            div.className = 'option';
-            div.innerText = `${letter}. ${opt}`;
-            div.onclick = () => {
-                document.querySelectorAll('.option').forEach(o => o.classList.remove('selected'));
-                div.classList.add('selected');
-                userAnswers[currentIdx] = letter;
-                document.getElementById('next-btn').classList.remove('hidden');
-            };
-            container.appendChild(div);
-        });
-    }
+  // EYE DISORDERS
+  {topic:"Eye Disorders",question:"A 50-year-old African American man with hypertension and T2DM has gradual peripheral vision loss, IOP=45 mmHg, enlarged cup-to-disc ratio. Type of glaucoma?",options:["Angle-closure glaucoma","Open-angle glaucoma","Normal-tension glaucoma","Congenital glaucoma"],answer:"B",explanation:"Open-angle glaucoma: gradual, painless, peripheral vision loss ('tunnel vision') with elevated IOP. African American descent, age >50, hypertension, and DM are significant risk factors. Enlarged cup-to-disc ratio indicates optic nerve damage."},
+  {topic:"Eye Disorders",question:"Bob has eye discomfort, redness, and an eye stuck shut in the morning. Thick purulent discharge on lid margins. Diagnosis and form?",options:["Viral conjunctivitis","Bacterial conjunctivitis","Allergic conjunctivitis","Uveitis"],answer:"B",explanation:"Bacterial conjunctivitis: purulent (thick, yellow-green) discharge that crusts overnight (eye stuck shut in morning). Most common pathogens: Staph aureus, Strep pneumoniae. Viral conjunctivitis causes watery discharge; allergic causes itching and clear discharge."},
 
-    function handleNext() {
-        if (++currentIdx < currentQuiz.length) {
-            renderQuestion();
-        } else {
-            document.getElementById('progress-fill').style.width = '100%';
-            showResults();
-        }
-    }
+  // NEUROPHYSIOLOGY BASICS
+  {topic:"Neurophysiology",question:"What primarily causes the neuron's resting membrane potential to be negative (≈ −70 mV)?",options:["The Na+/K+ pump pumps out 3 Na+ for every 2 K+ brought in","Open K+ leak channels allow more K+ to leave than Na+ can enter","Intracellular proteins carry negative charge","Voltage-gated Na+ channels are closed at rest"],answer:"B",explanation:"At rest, the membrane is most permeable to K+ (via K+ leak channels). K+ flows DOWN its concentration gradient (out of the cell) → inside becomes negative. The Na+/K+ pump contributes but is not the primary cause of the negative RMP."},
+  {topic:"Neurophysiology",question:"Which statement about the refractory period is TRUE?",options:["During absolute refractory, a strong stimulus can trigger another AP","Relative refractory occurs when Na+ channels are open and inactivated","During relative refractory period, K+ channels are still open","The refractory period affects the entire neuron equally"],answer:"C",explanation:"During the relative refractory period: Na+ channels have recovered (deinactivated) but K+ channels are still open → membrane is hyperpolarized below resting. A STRONGER-than-normal stimulus CAN trigger a new AP during relative refractory."},
+  {topic:"Neurophysiology",question:"During the stretch reflex, which statement describes the reflex arc?",options:["Somatic receptor→efferent fibers→integrating center→afferent fibers→effector","Somatic receptor→afferent nerve fibers→integrating center→efferent nerve fibers→effector muscle","Effector muscle→efferent fibers→integrating center→afferent fibers→somatic receptor","Effector muscle→afferent fibers→integrating center→efferent fibers→somatic receptor"],answer:"B",explanation:"Reflex arc: Receptor detects stimulus → afferent fibers carry signal to spinal cord (integrating center) → efferent fibers carry motor command to effector muscle. In monosynaptic stretch reflex: Ia afferent → directly synapses alpha motor neuron → muscle contracts."},
+  {topic:"Neurophysiology",question:"Aδ vs C nerve fibers — key differences?",options:["Both unmyelinated, Aδ slower, C faster","Aδ myelinated/fast/sharp pain; C unmyelinated/slow/dull-chronic pain","Aδ carries only temperature; C carries only pain","Both myelinated; differ only in diameter"],answer:"B",explanation:"Aδ fibers: myelinated, ~5–30 m/s, carry sharp/acute pain and cold temperature (first pain). C fibers: unmyelinated, <2 m/s, carry dull/burning/chronic pain, warm temperature, itch, and autonomic signals (second pain)."},
+  {topic:"Neurophysiology",question:"Spasticity (as in cerebral palsy) is defined as:",options:["Lack of balance or muscle coordination","Stiff muscles with regular (velocity-dependent) reflexive activity","Stiff muscles with irregular reflexive activity","Uncontrollable jerky movements (chorea)"],answer:"B",explanation:"Spasticity = velocity-dependent increase in muscle tone with exaggerated stretch reflexes. Caused by UMN lesions releasing spinal motor neurons from descending inhibition. Distinguished from rigidity (present at all velocities) seen in Parkinson's."},
 
-    function showResults() {
-        document.getElementById('quiz-screen').classList.add('hidden');
-        document.getElementById('results-screen').classList.remove('hidden');
-        let correctCount = 0;
-        let html = '';
+  // AUTONOMIC
+  {topic:"Autonomic Nervous System",question:"What is the effect of ADH on the collecting duct?",options:["Increases Na+ reabsorption via ENaC","Inserts aquaporin-2 channels increasing water reabsorption","Inhibits Na+/K+ pump","Causes vasoconstriction of afferent arteriole"],answer:"B",explanation:"ADH (vasopressin) binds V2 receptors → cAMP → PKA → AQP2 vesicles fuse with apical membrane → water moves from hyperosmotic medullary interstitium into collecting duct cells and then blood → concentrated urine."},
+];
 
-        currentQuiz.forEach((q, i) => {
-            const isCorrect = userAnswers[i] === q.answer;
-            if (isCorrect) correctCount++;
-            html += `
-                <div class="explanation">
-                    <strong>Q${i+1}: ${q.question}</strong><br>
-                    Result:
-                    <span style="color:${isCorrect ? '#4ade80' : '#fb7185'}">
-                        ${isCorrect ? 'Correct' : 'Incorrect'}
-                    </span>
-                    | Correct: ${q.answer}<br><br>
-                    <em>${q.explanation}</em>
-                </div>`;
-        });
+// ── STATE ───────────────────────────────────────────────────────────────────
+let allQuestions = RAW_QUESTIONS;
+let currentQuiz = [], currentIdx = 0, userAnswers = [], answered = false;
 
-        document.getElementById('score-display').innerText =
-            `${correctCount} / ${currentQuiz.length}`;
-        document.getElementById('review-area').innerHTML = html;
-    }
+// ── INIT ────────────────────────────────────────────────────────────────────
+function init() {
+  document.getElementById('q-count').textContent = `${allQuestions.length} questions loaded`;
+  renderChips();
+}
 
-    init();
+function renderChips() {
+  const topics = [...new Set(allQuestions.map(q => q.topic))];
+  const c = document.getElementById('topic-chips');
+  c.innerHTML = '';
+  topics.forEach(t => {
+    const chip = document.createElement('div');
+    chip.className = 'chip';
+    const count = allQuestions.filter(q => q.topic === t).length;
+    chip.textContent = `${t} (${count})`;
+    chip.onclick = () => {
+      document.getElementById('ai-input').value = `10 questions on ${t}`;
+      startQuiz();
+    };
+    c.appendChild(chip);
+  });
+}
+
+function startQuiz() {
+  const input = document.getElementById('ai-input').value.toLowerCase();
+  const numMatch = input.match(/\d+/);
+  const num = numMatch ? Math.min(parseInt(numMatch[0]), allQuestions.length) : 10;
+  const topics = [...new Set(allQuestions.map(q => q.topic))];
+  let pool = allQuestions.filter(q => {
+    if (input.includes('all') || input.includes('everything')) return true;
+    return topics.some(t => input.includes(t.toLowerCase()));
+  });
+  if (pool.length === 0) pool = allQuestions;
+  currentQuiz = pool.sort(() => Math.random() - 0.5).slice(0, num);
+  currentIdx = 0;
+  userAnswers = new Array(currentQuiz.length).fill(null);
+  answered = false;
+  document.getElementById('setup-screen').classList.add('hidden');
+  document.getElementById('quiz-screen').classList.remove('hidden');
+  renderQuestion();
+}
+
+function renderQuestion() {
+  answered = false;
+  const q = currentQuiz[currentIdx];
+  const pct = (currentIdx / currentQuiz.length) * 100;
+  document.getElementById('progress-fill').style.width = pct + '%';
+  document.getElementById('q-header').textContent =
+    `Q ${currentIdx + 1} / ${currentQuiz.length}  ·  ${q.topic.toUpperCase()}`;
+  document.getElementById('q-text').textContent = q.question;
+  document.getElementById('explanation-box').classList.add('hidden');
+  document.getElementById('next-btn').classList.add('hidden');
+  const container = document.getElementById('options-container');
+  container.innerHTML = '';
+  const letters = ['A','B','C','D','E'];
+  q.options.forEach((opt, i) => {
+    const div = document.createElement('div');
+    div.className = 'option';
+    div.textContent = `${letters[i]}. ${opt}`;
+    div.onclick = () => selectAnswer(div, letters[i], q);
+    container.appendChild(div);
+  });
+}
+
+function selectAnswer(div, letter, q) {
+  if (answered) return;
+  answered = true;
+  userAnswers[currentIdx] = letter;
+  const letters = ['A','B','C','D','E'];
+  const isCorrect = letter === q.answer;
+  document.querySelectorAll('.option').forEach((el, i) => {
+    el.onclick = null;
+    if (letters[i] === q.answer) el.classList.add('correct');
+    else if (letters[i] === letter && !isCorrect) el.classList.add('wrong');
+  });
+  const expBox = document.getElementById('explanation-box');
+  expBox.innerHTML = `<strong>${isCorrect ? '✅ Correct!' : '❌ Incorrect — Correct answer: ' + q.answer}</strong><br><br>${q.explanation}`;
+  expBox.classList.remove('hidden');
+  const nextBtn = document.getElementById('next-btn');
+  nextBtn.textContent = currentIdx + 1 < currentQuiz.length ? 'Next Question →' : 'See Results';
+  nextBtn.classList.remove('hidden');
+}
+
+function handleNext() {
+  currentIdx++;
+  if (currentIdx < currentQuiz.length) renderQuestion();
+  else showResults();
+}
+
+function showResults() {
+  document.getElementById('quiz-screen').classList.add('hidden');
+  document.getElementById('results-screen').classList.remove('hidden');
+  document.getElementById('progress-fill').style.width = '100%';
+  let correct = userAnswers.filter((a, i) => a === currentQuiz[i].answer).length;
+  const pct = Math.round((correct / currentQuiz.length) * 100);
+  document.getElementById('score-display').textContent = `${correct} / ${currentQuiz.length}`;
+  document.getElementById('stat-row').innerHTML =
+    `<span class="stat">🎯 ${pct}%</span><span class="stat">✅ ${correct} correct</span><span class="stat">❌ ${currentQuiz.length - correct} missed</span>`;
+  let html = '';
+  currentQuiz.forEach((q, i) => {
+    const ok = userAnswers[i] === q.answer;
+    html += `<div class="explanation">
+      <strong>Q${i+1}: ${q.question}</strong><br>
+      <span style="color:${ok?'#4ade80':'#fb7185'}">${ok?'✅ Correct':'❌ Incorrect'}</span>
+      ${!ok ? ` — Correct: <strong>${q.answer}</strong>` : ''}
+      <br><small style="color:var(--muted)">${q.topic}</small>
+      <br><br>${q.explanation}
+    </div>`;
+  });
+  document.getElementById('review-area').innerHTML = html;
+}
+
+init();
 </script>
 </body>
 </html>
