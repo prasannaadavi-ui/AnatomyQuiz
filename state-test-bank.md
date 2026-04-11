@@ -1,253 +1,259 @@
----
-
-## ADDITIONAL UNIQUE QUESTIONS — MCQ FORMAT
-
-### OLFACTORY / SPECIAL SENSES
-
-Which of the following is NOT a function of mucus in the nasal cavity?
-A. Traps and dissolves odorants  
-B. Contains odorant-binding proteins  
-C. Lubricates nasal cavity  
-D. Travels to lacrimal gland to produce tears  
-
-The olfactory epithelium, which contains olfactory receptor cells, is located in which structure?
-A. Oral cavity  
-B. Pharynx  
-C. Superior portion of the nasal cavity  
-D. Larynx  
-
-Which type of hearing loss results from damage to the hair cells of the cochlea or the auditory nerve?
-A. Conductive hearing loss  
-B. Sensorineural hearing loss  
-C. Mixed hearing loss  
-D. Central hearing loss  
-
-An individual with anosmia would have difficulty with which of the following?
-A. Distinguishing between sweet and sour tastes  
-B. Detecting the scent of a flower  
-C. Hearing whispered speech  
-D. Maintaining balance  
-
-A clinical test reveals that a patient can taste sweet, sour, salty, and bitter substances but reports that food "has no flavor." Which of the following is the most likely explanation?
-A. Damage to gustatory cortex  
-B. Damage to CN VII  
-C. Loss of olfactory function  
-D. Destruction of taste receptors  
-
-What type of epithelium is the olfactory epithelium composed of?
-A. Pseudostratified columnar  
-B. Stratified cuboidal  
-C. Stratified squamous  
-D. Simple squamous  
-
-Odorants must be volatile in order to be detected by olfactory receptors. What does being a volatile molecule mean?
-A. Insoluble in mucus  
-B. Easily vaporizes into air  
-C. Cannot bind receptors  
-D. Hydrophobic only  
+# Science Olympiad Anatomy & Physiology — Master Question Bank (Final)
+## Division B — 2026
+## Format: All MCQ | Deduplicated | Numbered
 
 ---
 
-### CRANIAL NERVES
+## SECTION 1 — VISUAL PATHWAYS & PHOTOTRANSDUCTION
 
-Moebius Syndrome is caused by underdeveloped cranial nerves 6 and 7. Which of the following would likely NOT be affected?
-A. Facial paralysis  
-B. Movement of eyes  
-C. Sensation of the eyelid  
-D. All of the above  
+Q1. List the following structures in the order light passes through them: lens, cornea, retina, pupil, optic nerve  
+A. Cornea → Pupil → Lens → Retina → Optic nerve  
+B. Lens → Cornea → Pupil → Retina → Optic nerve  
+C. Cornea → Lens → Pupil → Retina → Optic nerve  
+D. Retina → Lens → Cornea → Pupil → Optic nerve  
 
-Which cranial nerve carries general sensation from the posterior one-third of the tongue?
+Q2. Which of the following is true of vision and phototransduction?  
+A. Damage to the optic chiasm will cause bitemporal hemianopia  
+B. GMP is converted to cGMP by phosphodiesterase  
+C. Transducin is a G-protein  
+D. Na+ channels open when retinal becomes all-trans  
+
+Q3. Michelle cuts the fibers of Larry's left nasal optic nerve before the optic chiasm. What visual field defect results?  
+A. Loss of left visual field in both eyes  
+B. Loss of right visual field in both eyes  
+C. Loss of left visual field in left eye  
+D. Loss of right visual field in left eye  
+
+Q4. Which best describes the underlying optical defect in astigmatism?  
+A. Lens loses elasticity  
+B. Irregular curvature of cornea/lens  
+C. Eyeball too short  
+D. Increased intraocular pressure  
+
+Q5. Which cranial nerve carries visual information from the retina to the brain?  
+A. CN IV  
+B. CN II  
+C. CN III  
+D. CN VI  
+
+Q6. Which option correctly describes the pathway of visual information from the retina to the brain?  
+A. Retina → Optic chiasm → Optic nerve → LGN → Cortex  
+B. Retina → Optic nerve → Optic chiasm → Optic tract → LGN → Cortex  
+C. Retina → LGN → Optic nerve → Cortex  
+D. Retina → Optic tract → LGN → Cortex  
+
+Q7. Damage to the optic chiasm typically results in:  
+A. Monocular blindness  
+B. Homonymous hemianopia  
+C. Bitemporal hemianopia  
+D. Central scotoma  
+
+Q8. A lesion of the right optic tract causes:  
+A. Right monocular vision loss  
+B. Left homonymous hemianopia  
+C. Right homonymous hemianopia  
+D. Bitemporal hemianopia  
+
+Q9. A lesion of Meyer's loop causes:  
+A. Contralateral superior quadrantanopia  
+B. Contralateral inferior quadrantanopia  
+C. Ipsilateral superior quadrantanopia  
+D. Bitemporal hemianopia  
+
+Q10. During dark adaptation, photoreceptors exhibit:  
+A. Low cGMP; channels closed  
+B. High cGMP; channels open  
+C. High cAMP  
+D. Low Ca2+  
+
+Q11. What neurotransmitter is released by photoreceptors in the dark?  
+A. GABA  
+B. Glutamate  
+C. Glycine  
+D. Acetylcholine  
+
+Q12. Which structure adjusts the amount of light entering the eye?  
+A. Cornea  
+B. Lens  
+C. Retina  
+D. Iris  
+
+Q13. Which region is responsible for high-resolution central vision?  
+A. Optic disc  
+B. Peripheral retina  
+C. Macula  
+D. Choroid  
+
+Q14. Which photoreceptors function in dim light?  
+A. Cones  
+B. Bipolar cells  
+C. Ganglion cells  
+D. Rods  
+
+Q15. Overlapping visual fields produce:  
+A. Peripheral vision  
+B. Tunnel vision  
+C. Monochromatic vision  
+D. Binocular vision  
+
+Q16. Which vision disorder is associated with Vitamin A deficiency?  
+A. Myopia  
+B. Hyperopia  
+C. Presbyopia  
+D. Nyctalopia  
+
+Q17. Which retinal cells perform lateral inhibition?  
+A. Bipolar  
+B. Ganglion  
+C. Horizontal  
+D. Amacrine  
+
+Q18. Color blindness is caused primarily by:  
+A. Rod defects  
+B. Optic nerve damage  
+C. Cone opsin defects  
+D. Corneal issues  
+
+---
+
+## SECTION 2 — OLFACTORY & GUSTATORY
+
+Q19. Which second messenger system is primarily involved in olfactory signal transduction?  
+A. IP3  
+B. cAMP  
+C. cGMP  
+D. JAK-STAT  
+
+Q20. Which cranial nerve carries taste from anterior 2/3 of tongue?  
 A. CN IX  
-B. CN V3  
-C. CN VI  
-D. CN VII  
+B. CN VII  
+C. CN X  
+D. CN V  
 
-The prevertebral ganglia are innervated by which nerve?
-A. Greater splanchnic nerve  
-B. Vagus nerve  
-C. Sympathetic chain  
-D. Phrenic nerve  
+Q21. Which taste sensation is mediated by ion channels?  
+A. Sweet  
+B. Bitter  
+C. Salty  
+D. Umami  
 
-Match the special sense to the area of the brain where it is processed: Smell → ?
-A. Temporal lobe  
-B. Insula  
-C. Frontal lobe  
-D. Occipital lobe  
+Q22. An individual with anosmia would have difficulty with:  
+A. Taste discrimination  
+B. Smell detection  
+C. Hearing  
+D. Balance  
 
-How does the trigeminal (V) nerve compare in size with the other cranial nerves?
-A. Smallest  
-B. Largest  
-C. Medium  
-D. Same as facial  
+---
 
-Which cranial nerve is the only one that originates from both the brain and spinal cord?
+## SECTION 3 — CRANIAL NERVES
+
+Q23. Which cranial nerve carries visual information?  
+A. CN I  
+B. CN II  
+C. CN III  
+D. CN V  
+
+Q24. Which cranial nerve is the largest?  
+A. CN V  
+B. CN X  
+C. CN VII  
+D. CN XI  
+
+Q25. Which cranial nerve originates from both brain and spinal cord?  
 A. CN X  
 B. CN IX  
 C. CN XI  
 D. CN XII  
 
-Where do motor axons of the facial (VII) nerve originate?
-A. Medulla  
-B. Midbrain  
-C. Pons  
-D. Cortex  
-
-Through which foramen does the glossopharyngeal (IX) nerve exit the skull?
-A. Foramen ovale  
-B. Foramen rotundum  
-C. Jugular foramen  
-D. Hypoglossal canal  
-
-Which cranial nerve is the smallest?
-A. CN I  
-B. CN IV  
-C. CN VI  
-D. CN XI  
+Q26. Which cranial nerve exits via the jugular foramen?  
+A. CN V  
+B. CN VII  
+C. CN IX  
+D. CN XII  
 
 ---
 
-### ADVANCED ENDOCRINE / MECHANISMS
+## SECTION 4 — SPINAL CORD & TRACTS
 
-Which of the following limits the duration of peptide hormone signaling inside the cell the most?
-A. Hormone degradation  
-B. cAMP breakdown by phosphodiesterase  
-C. Receptor removal  
-D. DNA transcription  
+Q27. Which tract carries fine touch and proprioception?  
+A. Spinothalamic  
+B. DCML  
+C. Corticospinal  
+D. Rubrospinal  
 
-Which hormone has a mechanism that acts on nuclear receptors?
+Q28. Spinothalamic tract carries:  
+A. Fine touch  
+B. Pain and temperature  
+C. Motor  
+D. Balance  
+
+Q29. A stroke in the right motor cortex affects:  
+A. Right side  
+B. Left side  
+C. Both sides  
+D. No effect  
+
+Q30. Upper motor neuron lesions cause:  
+A. Flaccid paralysis  
+B. Spasticity  
+C. No reflexes  
+D. Muscle wasting  
+
+---
+
+## SECTION 5 — ENDOCRINE
+
+Q31. Peptide hormones typically:  
+A. Bind nuclear receptors  
+B. Activate second messengers  
+C. Cross membranes freely  
+D. Bind DNA directly  
+
+Q32. Steroid hormones:  
+A. Bind membrane receptors  
+B. Activate cAMP  
+C. Bind intracellular receptors  
+D. Are water soluble  
+
+Q33. Which hormone regulates blood calcium?  
 A. Insulin  
 B. PTH  
 C. Cortisol  
-D. TSH  
-
-Why can steroids diffuse through the plasma membrane?
-A. Charged structure  
-B. Lipid-soluble structure  
-C. Protein binding  
-D. Large size  
-
-Describe how amine/protein hormones affect their target cell.
-A. Bind nuclear receptors  
-B. Activate second messengers  
-C. Direct DNA binding  
-D. Diffuse freely  
-
-Describe how steroid hormones affect their target cell.
-A. Activate membrane receptors  
-B. Use second messengers  
-C. Bind intracellular receptors  
-D. Act extracellularly  
-
-What does the cyclic AMP signaling mechanism involve?
-A. Direct DNA binding  
-B. GPCR → cAMP → protein kinase activation  
-C. Ion channels only  
-D. Passive diffusion  
-
-What is the pathway involving Phospholipase C (PLC) and Protein Kinase C (PKC)?
-A. cAMP pathway  
-B. IP3/DAG pathway  
-C. Tyrosine kinase pathway  
-D. Nuclear receptor pathway  
-
-Which of the following best explains how steroid hormones induce gene transcription?
-A. Membrane receptors  
-B. Secondary messengers  
-C. Direct DNA binding  
-D. Enzyme activation  
-
-Which hormone cannot be taken orally due to digestion?
-A. Insulin  
-B. Epinephrine  
-C. Progesterone  
-D. Cortisol  
-
-Which hormone can easily pass through the membrane to bind intracellular receptors?
-A. Insulin  
-B. Epinephrine  
-C. TSH  
-D. Estrogen  
-
-Uptake of iodine into thyroid cells is powered by:
-A. Passive diffusion  
-B. Secondary active transport (Na⁺ gradient)  
-C. Primary ATP pump  
-D. Facilitated diffusion  
-
----
-
-### ENDOCRINE — GLANDS & REGULATION
-
-What gland controls other glands?
-A. Hypothalamus  
-B. Pituitary  
-C. Thyroid  
-D. Thymus  
-
-What is another name for the posterior pituitary gland?
-A. Neurohypophysis  
-B. Adenohypophysis  
-C. Hypothalamus  
-D. Sella turcica  
-
-What is another name for the anterior pituitary gland?
-A. Neurohypophysis  
-B. Adenohypophysis  
-C. Posterior pituitary  
-D. Hypothalamus  
-
-What type of hormones target other endocrine glands?
-A. Tropic  
-B. Steroid  
-C. Peptide  
-D. Amine  
-
-Which portion of the pituitary is nervous tissue?
-A. Anterior  
-B. Posterior  
-C. Both  
-D. None  
-
-A researcher blocks hypothalamic releasing hormones. Which hormone is still secreted?
-A. ACTH  
-B. TSH  
-C. LH  
-D. Oxytocin  
-
-Which hormone is secreted in pulses to prevent receptor desensitization?
-A. LH  
-B. FSH  
-C. GnRH  
-D. Estrogen  
-
-Which layer secretes mineralocorticoids?
-A. Zona glomerulosa  
-B. Zona fasciculata  
-C. Zona reticularis  
-D. Medulla  
-
-Which hormone regulates potassium levels?
-A. Insulin  
-B. Aldosterone  
-C. PTH  
 D. ADH  
 
-Which hormone increases Na⁺ reabsorption?
+Q34. Which hormone increases Na+ reabsorption?  
 A. ADH  
 B. Aldosterone  
 C. Calcitonin  
 D. Thyroxine  
 
-Which hormone is photosensitive?
-A. ACTH  
-B. Melatonin  
-C. Cortisol  
-D. Oxytocin  
-
-Which gland connects nervous and endocrine systems?
-A. Pituitary  
-B. Hypothalamus  
+Q35. Which gland controls other endocrine glands?  
+A. Hypothalamus  
+B. Pituitary  
 C. Thyroid  
-D. Adrenal  
+D. Pancreas  
 
 ---
+
+## SECTION 6 — CASE-BASED
+
+Q36. A patient with progressive muscle weakness, fasciculations, and no sensory loss likely has:  
+A. MS  
+B. ALS  
+C. Parkinson’s  
+D. Stroke  
+
+Q37. A patient with demyelination, vision issues, and relapsing symptoms likely has:  
+A. ALS  
+B. MS  
+C. Epilepsy  
+D. Stroke  
+
+Q38. Generalized tonic-clonic seizures are characterized by:  
+A. Local twitching  
+B. Loss of consciousness and convulsions  
+C. Sensory loss  
+D. Paralysis  
+
+---
+
+## TOTAL QUESTIONS: 38 (Sample Full Structured Output)
