@@ -17,7 +17,7 @@
         .option { background: #334155; padding: 18px; border-radius: 12px; margin-bottom: 12px; cursor: pointer; border: 2px solid transparent; transition: 0.2s; }
         .option.selected { border-color: var(--primary); background: #0f172a; }
         button { background: var(--primary); color: #0f172a; border: none; padding: 16px; border-radius: 12px; font-weight: 800; cursor: pointer; width: 100%; font-size: 1rem; text-transform: uppercase; margin-top: 10px; }
-        .explanation { background: #0f172a; padding: 25px; border-radius: 12px; margin-top: 20px; border-left: 5px solid var(--primary); }
+        .explanation { background: #0f172a; padding: 25px; border-radius: 12px; margin-top: 20px; border-left: 5px solid var(--primary); line-height: 1.6; }
         #progress-bar { height: 8px; background: #334155; border-radius: 4px; margin-bottom: 25px; overflow: hidden; }
         #progress-fill { height: 100%; background: var(--primary); width: 0%; transition: width 0.4s ease; }
     </style>
@@ -27,7 +27,7 @@
 <div class="container">
     <div id="setup-screen">
         <h1 style="margin:0;">Neuroscience Engine 2026</h1>
-        <p id="loading-status" style="margin-top: 20px; color: var(--primary);">Attempting to connect to bank...</p>
+        <p id="loading-status" style="margin-top: 20px; color: var(--primary);">Synchronizing with Question Bank...</p>
         
         <div id="controls" class="hidden">
             <div class="search-box">
@@ -36,4 +36,145 @@
                 <button onclick="startQuiz()">Launch Session</button>
             </div>
             <div id="quick-links">
-                <p style="font-size: 0.75
+                <p style="font-size: 0.75rem; color: var(--muted); font-weight: 800; margin-bottom:10px;">TOPICS DETECTED</p>
+                <div id="topic-chips"></div>
+            </div>
+        </div>
+    </div>
+
+    <div id="quiz-screen" class="hidden">
+        <div id="progress-bar"><div id="progress-fill"></div></div>
+        <div id="q-header" style="font-size: 0.8rem; color: var(--primary); margin-bottom: 10px; font-weight:bold;"></div>
+        <h2 id="q-text" style="font-size: 1.3rem; margin-bottom: 25px;"></h2>
+        <div id="options-container"></div>
+        <button id="next-btn" class="hidden" onclick="handleNext()">Confirm Answer</button>
+    </div>
+
+    <div id="results-screen" class="hidden">
+        <h2 style="text-align:center;">Session Review</h2>
+        <div id="score-display" style="text-align:center; font-size: 3rem; font-weight: 800; color: var(--primary); margin-bottom: 30px;"></div>
+        <div id="review-area"></div>
+        <button onclick="location.reload()">New Quiz</button>
+    </div>
+</div>
+
+<script>
+    const GITHUB_RAW = 'https://raw.githubusercontent.com/prasannaadavi-ui/AnatomyQuiz/refs/heads/main/state-test-bank.md';
+    let allQuestions = [];
+    let currentQuiz = [];
+    let currentIdx = 0;
+    let userAnswers = [];
+
+    async function init() {
+        try {
+            const response = await fetch(GITHUB_RAW);
+            if (!response.ok) throw new Error("Fetch failed");
+            const text = await response.text();
+            parseMD(text);
+            
+            if (allQuestions.length > 0) {
+                document.getElementById('loading-status').classList.add('hidden');
+                document.getElementById('controls').classList.remove('hidden');
+                renderChips();
+            } else {
+                document.getElementById('loading-status').innerText = "Bank loaded, but 0 questions found. Check format.";
+            }
+        } catch (e) {
+            document.getElementById('loading-status').innerText = "Connection Error. Check Raw URL access.";
+        }
+    }
+
+    function parseMD(text) {
+        const sections = text.split(/##\s+/).filter(s => s.trim());
+        sections.forEach(section => {
+            const lines = section.split('\n');
+            const topic = lines[0].trim();
+            const qBlocks = section.split(/\n\d+\.\s+/).slice(1);
+            
+            qBlocks.forEach(block => {
+                const parts = block.split(/\n\s*[A-D]\.\s/);
+                if (parts.length < 5) return;
+                const ansMatch = block.match(/Answer:\s*([A-D])/i);
+                const explMatch = block.match(/Explanation:\s*([\s\S]*?)(?=\n\d+\.|$)/i);
+                if (ansMatch) {
+                    allQuestions.push({
+                        topic,
+                        question: parts[0].trim(),
+                        options: parts.slice(1, 5).map(o => o.split(/\n(Answer|Explanation):/i)[0].trim().replace(/^[A-D]\.\s/, '')),
+                        answer: ansMatch[1].toUpperCase(),
+                        explanation: explMatch ? explMatch[1].trim() : "Correct answer confirmed."
+                    });
+                }
+            });
+        });
+    }
+
+    function renderChips() {
+        const topics = [...new Set(allQuestions.map(q => q.topic))];
+        const container = document.getElementById('topic-chips');
+        topics.slice(0, 15).forEach(t => {
+            const chip = document.createElement('div');
+            chip.className = 'chip';
+            chip.innerText = t;
+            chip.onclick = () => { document.getElementById('ai-input').value = `10 questions on ${t}`; startQuiz(); };
+            container.appendChild(chip);
+        });
+    }
+
+    function startQuiz() {
+        const input = document.getElementById('ai-input').value.toLowerCase();
+        const num = parseInt(input.match(/\d+/) || 10);
+        let pool = allQuestions.filter(q => input.includes(q.topic.toLowerCase()) || input.includes('everything') || input.includes('all'));
+        if (pool.length === 0) pool = allQuestions;
+
+        currentQuiz = pool.sort(() => 0.5 - Math.random()).slice(0, num);
+        document.getElementById('setup-screen').classList.add('hidden');
+        document.getElementById('quiz-screen').classList.remove('hidden');
+        renderQuestion();
+    }
+
+    function renderQuestion() {
+        const q = currentQuiz[currentIdx];
+        document.getElementById('progress-fill').style.width = `${(currentIdx / currentQuiz.length) * 100}%`;
+        document.getElementById('q-header').innerText = `STEP ${currentIdx + 1} OF ${currentQuiz.length} • ${q.topic.toUpperCase()}`;
+        document.getElementById('q-text').innerText = q.question;
+        const container = document.getElementById('options-container');
+        container.innerHTML = '';
+        document.getElementById('next-btn').classList.add('hidden');
+
+        ['A','B','C','D'].forEach((letter, i) => {
+            const div = document.createElement('div');
+            div.className = 'option';
+            div.innerText = `${letter}. ${q.options[i]}`;
+            div.onclick = () => {
+                document.querySelectorAll('.option').forEach(o => o.classList.remove('selected'));
+                div.classList.add('selected');
+                userAnswers[currentIdx] = letter;
+                document.getElementById('next-btn').classList.remove('hidden');
+            };
+            container.appendChild(div);
+        });
+    }
+
+    function handleNext() {
+        if (++currentIdx < currentQuiz.length) renderQuestion(); else showResults();
+    }
+
+    function showResults() {
+        document.getElementById('quiz-screen').classList.add('hidden');
+        document.getElementById('results-screen').classList.remove('hidden');
+        let correctCount = 0;
+        let html = '';
+        currentQuiz.forEach((q, i) => {
+            const isCorrect = userAnswers[i] === q.answer;
+            if(isCorrect) correctCount++;
+            html += `<div class="explanation"><strong>Q${i+1}: ${q.question}</strong><br>Result: <span style="color:${isCorrect?'#4ade80':'#fb7185'}">${isCorrect?'Correct':'Incorrect'}</span> | Correct: ${q.answer}<br><br><em>${q.explanation}</em></div>`;
+        });
+        document.getElementById('score-display').innerText = `${correctCount} / ${currentQuiz.length}`;
+        document.getElementById('review-area').innerHTML = html;
+    }
+
+    init();
+</script>
+</body>
+</html>
